@@ -1,124 +1,95 @@
 # Harbor diary mockup brief
 
-Status: draft for review, Oct 15 2026
-Scope: the closed cover, Opening 1 (Introduction), Opening 2 (Portfolio)
-Design System: "Harbor Design System" (Claude Design). Use its tokens for every color, font, space, shadow and timing. No new values unless this brief says so.
+Status: updated Oct 24 2026
+Scope: the closed cover, Opening 1 (Introduction), Opening 2 (Portfolio), then phone versions
+Mockup canvas: "Harbor diary mockups" (Claude Design)
+Design System: "Harbor Design System" (Claude Design). Use its tokens for every color, font, space, shadow and timing.
 
 ---
 
 ## 1. What this mockup is for
 
-To see the real look of the diary before styling the code. It answers: does the open-book layout read well, does the cover feel right, is everything easy to find and read.
+To see the real look of the diary before styling the code. It answers: does the open-book layout read well, does it feel vintage, is everything easy to find and read.
 
-It is a picture of the site, not the site. Motion is described here but only shown as before/after frames.
+It is a picture of the site, not the site. Motion is described here and built later in code.
 
 ## 2. Ground rules
 
-- One look only: ink on paper. No dark mode.
+- One look only: ink on old paper. No dark mode.
 - User friendly beats pretty. If a creative detail makes anything harder to read or find, it goes.
-- Headings: IM Fell English (26px and up). Reading text: EB Garamond (18px minimum).
-- Madder red is rare: one or two things per screen.
-- Brass gold is decoration only, never text.
+- Headings: IM Fell English. Reading text: EB Garamond (18px minimum).
+- Madder red #8B2E23 is rare: one or two things per screen.
+- Brass #A8823C is decoration only, never text.
 - All placeholder content is clearly marked as placeholder.
-
-### New color for this mockup (to add to the Design System if approved)
-
-| Token | Hex | Use |
-| --- | --- | --- |
-| `brass` | #A8823C | Thin lines, corner pieces, the cover clasp, page edge details. Never text, never icons that carry meaning. |
+- No photo or portrait of Abdullah anywhere on the site.
+- Code-drawn textures are stand-ins. Real public domain or CC0 artwork can replace them later.
 
 ## 3. The frame
 
-- **Desk:** the whole screen behind the book is `umber` with the soft haze. The book sits in the middle.
-- **Laptop and desktop:** the book opens as a two-page spread. Left page and right page side by side, a soft fold shadow down the middle (the gutter).
-- **Phones:** one page at a time. Left page first, swipe or tap next to see the right page. Same diary, just narrower.
+- Desk: warm mid-brown behind the book, not too dark.
+- Laptop and desktop: two-page spread with a gutter shadow down the middle.
+- Phones: one page at a time.
 - Each opening keeps its own URL: Opening 1 = `/`, Opening 2 = `/portfolio`.
-- Pages are `paper` with `haze-page` at the edges. Faint ruled lines in `hairline`, like a notebook.
+- Nav: cream version of the logo top left (not the word "Harbor"), then Home, Portfolio, Services, Contact.
 
-## 4. The closed cover
+## 4. The closed cover (LOCKED Oct 24 2026)
 
-Shown once per visit, sits over Opening 1 on the main URL. Deep links skip it.
+- Vintage parchment cover (not dark leather) with stains, grit and engraving hatching near the edges.
+- Thin hand-printed double frame with scroll corners.
+- Dark leather spine reading "HARBOR · VOL. I", ribbon bookmark, visible page block, worn corners.
+- Cover text, top to bottom: VOL. I · MMXXVI, scroll divider, logo, "Harbor" (IM Fell English), divider, "The working notebook of Abdullah Saghir".
+- Not used: burnt edges, clasp, heavy carved frame, medallion or holy-book style ornaments.
+- The cover is a real button for keyboard and screen readers. Shown once per visit; deep links skip it.
 
-- Book cover in `umber`, cloth-like texture, slightly lighter than the desk so it stands out.
-- A paper label plate in the middle (`paper-shade`, thin `brass` border), like old notebooks had. On it:
-  - Full logo (the geometric astrolabe), 200px or bigger
-  - **Harbor** in `display-cover` (72px, 48px on phones)
-  - Tagline in `body-lead`: "Independent projects across technology, science and culture." (working tagline, not final)
-- Small `brass` corner pieces on the four cover corners.
-- A `brass` clasp on the right edge (the thing that "unlocks" when the book opens).
-- Hint under the book in `ink-soft` on umber (must pass contrast, check it): "Click, tap, scroll or swipe to open"
-- Open by: click, tap, scroll, swipe, Enter or Space key. The cover is a real button for keyboard and screen readers.
+## 5. Pages (LOCKED Oct 24 2026)
 
-## 5. Opening 1: Introduction
+- Warm aged lined paper, rough grain, soft stains, ink splatter in two corners, faint coffee rings, faint fold line across the middle.
+- Golden ruled lines, faded red margin line, gutter shadow.
+- No postcards, stamps or collage items on the pages.
+- Text-to-line alignment gets fine-tuned in the real code with real fonts.
 
-**Left page**
-- Small label at top: `PAGE I` (label style, `ink-soft`)
-- Title in `display-page`: "Hello, I'm Abdullah" (placeholder)
-- 2 to 3 short paragraphs in `body` about him: placeholder text, marked as placeholder
-- Portrait spot: an empty oval frame drawn in ink lines with a thin `brass` inner line, label "Portrait (later)". Not a real portrait yet.
+## 6. Opening 1: Introduction (LOCKED Oct 24 2026)
 
-**Right page**
-- Label: `PAGE II`
-- Title in `display-section`: "What Harbor is"
-- 1 short paragraph, placeholder
-- A short list of what lives in Harbor (projects, writing, research, services) as plain text lines, not cards
-- One madder link at the bottom: "Turn to the portfolio"
-- Bottom corner: small hint in `ink-soft`, "Scroll or swipe to turn the page" (only on this opening)
+Left page
+- `PAGE I`, title "Hello, I'm Abdullah", scroll divider
+- Pen sketch of a river valley, labelled "fig. i"
+- Short placeholder paragraphs about him
 
-## 6. Opening 2: Portfolio
+Right page
+- `PAGE II`, title "What Harbor is", one placeholder paragraph
+- Table of contents: each section with its page number, each line clickable (to update in the mockup)
+- Small hint: "Scroll or swipe to turn the page" (only on this opening)
 
-**Left page**
-- Label: `PAGE III`
-- Big title in `display-page`: "Portfolio"
-- One line under it in `body-lead`: "Things I've built, finished and published." (placeholder)
-- A margin sketch below (see creative touches)
+Bottom bar: "Close the book", page marker, next section.
 
-**Right page**
-- Label: `PAGE IV`
-- A list of 4 placeholder items, written like notebook entries, not app cards:
-  - Item title in `display-sub` (for example "Project title one")
-  - One line description in `body`
-  - Status tag in `label` style: `PLACEHOLDER`
-  - The whole entry is clickable and opens its own page later. Hover: title turns madder, a thin underline draws in.
-- Thin `hairline` rule between entries.
+## 7. Opening 2: Portfolio (next)
 
-## 7. Always visible, every opening
+- Left page: `PAGE III`, big title "Portfolio", one placeholder line.
+- Right page: clickable project headings only (placeholders). Each one opens its own project page.
+- Hover: heading turns madder, a thin underline draws in.
 
-- **Menu:** Harbor (home), Home, Portfolio, Services, Contact. Always reachable, never hidden behind a gesture only.
-- **Page marker:** "Opening 1 of 4" or the page numbers, in `ink-soft`.
-- **Previous / Next buttons** at the bottom of the book, not mid-page.
-- **Contact** reachable from every opening.
-- Keyboard: left and right arrows turn pages. Visible focus ring in madder.
+After that, each section (Services, Contact and so on) gets its own opening in the same style.
 
-## 8. Creative touches
+## 8. Always visible, every opening
 
-All drawn in faded ink, like Leonardo's margins. None of them carry information, so the site still works without them.
+- Menu always reachable, never hidden behind a gesture only.
+- Page marker and Previous / Next at the bottom of the book.
+- Contact reachable from every opening.
+- Keyboard: left and right arrows turn pages. Visible focus ring.
 
-**Keeping (decided Oct 15 2026):**
+## 9. Motion (built later in code)
 
-1. **Margin sketches per opening:** Introduction gets a half-finished drawing of the astrolabe with construction lines and compass arcs. Portfolio gets small study drawings (gears, a leaf, a circuit line) in the left page margin.
-2. **Star "you are here":** very faint dotted constellation lines in the page corners, with the one madder star from the logo sitting next to the page number.
-3. **Brass page edges:** the stacked page edges visible on the right side of the book get a thin brass line, like gilded book edges.
-
-**Dropped for now:**
-
-- Ribbon bookmark: a ribbon looks clickable, so people would try to use it as a menu. Confusing, and it competes with the real menu.
-- Handwritten-style margin notes: extra images to draw for little value. Can come back later.
-
-## 9. Motion (described now, built later)
-
-- Cover opening: `duration-cover` 1100ms, `ease-turn`. Clasp unlatches, cover swings left, Opening 1 is revealed.
-- Page turn: `duration-page` 700ms, `ease-turn`, shadow under the turning page.
-- Reduced motion: everything becomes a 150ms fade.
+- Cover opening: cover swings open to Opening 1.
+- Page turn: page flips with a soft shadow.
+- Page change effect: "old camera" (brass shutter or photo developing), only when moving to a new page (portfolio, a project page), not on every click. Under 1 second.
+- Reduced motion setting: everything becomes a short fade.
 - Nothing bouncy.
 
-## 10. Not in this mockup
+## 10. Order
 
-Services, Contact, single project pages, real text, real portrait, real projects, the flip animation itself.
-
-## 11. Order
-
-1. Cover only. Review.
-2. Opening 1 (laptop and phone). Review.
-3. Opening 2 (laptop and phone). Review.
-4. Add `brass` to the Design System once approved.
+1. Cover, laptop. LOCKED
+2. Opening 1, laptop. LOCKED (table of contents still to add)
+3. Opening 2, laptop
+4. Phone versions of cover and openings
+5. Add brass to the Design System
+6. Style the real code to match
