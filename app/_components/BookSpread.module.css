@@ -9,10 +9,12 @@
   --book-max: 1200px;
 
   flex: 1;
+    position: relative;
   display: grid;
   place-items: center;
   box-sizing: border-box;
   padding: var(--chrome-top) 16px var(--chrome-bottom);
+
 }
 
 .book {
@@ -117,4 +119,21 @@
 .pageRight {
   left: calc(530 * var(--u));
   padding: calc(52 * var(--u)) calc(60 * var(--u)) calc(48 * var(--u)) calc(64 * var(--u));
+}
+
+/* Nav slots, sitting in the space .stage keeps free */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--chrome-top);
+}
+
+.footer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--chrome-bottom);
 }

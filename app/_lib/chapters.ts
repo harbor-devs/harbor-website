@@ -50,3 +50,6 @@ export function getChapterNav(slug: ChapterSlug) {
     next: index < CHAPTERS.length - 1 ? CHAPTERS[index + 1] : null, // null = close the book
   };
 }
+
+// The object getChapterNav returns, so components can type their props.
+export type ChapterNav = ReturnType<typeof getChapterNav>;

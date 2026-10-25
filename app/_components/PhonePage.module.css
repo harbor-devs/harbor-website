@@ -8,6 +8,7 @@
   --page-max: 520px;
 
   flex: 1;
+    position: relative;
   display: grid;
   place-items: center;
   box-sizing: border-box;
@@ -99,4 +100,21 @@
   font-weight: 500;
   font-size: calc(17 * var(--u));
   line-height: calc(25 * var(--u));
+}
+
+/* Nav slots, sitting in the space .stage keeps free */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--chrome-top);
+}
+
+.footer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--chrome-bottom);
 }

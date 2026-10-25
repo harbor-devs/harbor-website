@@ -68,3 +68,14 @@ h3 {
   font-family: var(--font-display);
   font-weight: 400;
 }
+
+/* One focus ring for every link and button: thin brass outline */
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+}
+
+/* Stop the page behind the open phone menu from scrolling */
+html:has(dialog[open]) {
+  overflow: hidden;
+}

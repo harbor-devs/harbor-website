@@ -1,0 +1,159 @@
+/* Menu button in the phone header */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  color: var(--color-paper-deep);
+  font: 500 13px/18px var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* The dialog covers the whole screen but is see-through.
+   Only the paper sheet inside is visible. */
+.dialog {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  color: var(--color-umber);
+}
+
+/* Only when open, otherwise the browser's own "hidden" rule must win */
+.dialog[open] {
+  display: grid;
+  place-items: center;
+}
+
+.dialog::backdrop {
+  background: rgba(26, 18, 10, 0.75);
+}
+
+/* The sheet is a real phone diary page: same size, same paper,
+   so the contents line up with its ruled lines exactly like the Intro page. */
+.sheet {
+  position: relative;
+  width: min(100%, 360px);
+  aspect-ratio: 330 / 467;
+  border-radius: 0 3px 3px 0;
+  background: url("/textures/page-phone-intro.webp") 0 0 / 100% 100% no-repeat;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  container-type: inline-size;
+  /* 1 canvas pixel, same system as PhonePage */
+  --u: calc(100cqw / 330);
+  font-weight: 500;
+}
+
+/* Brass is too faint on paper, so focus rings in here are red */
+.sheet :focus-visible {
+  outline-color: var(--color-madder);
+}
+
+.label {
+  position: absolute;
+  left: calc(36 * var(--u));
+  top: calc(30 * var(--u));
+  margin: 0;
+  font-size: calc(12 * var(--u));
+  line-height: calc(18 * var(--u));
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-madder);
+}
+
+.title {
+  position: absolute;
+  left: calc(36 * var(--u));
+  top: calc(54 * var(--u));
+  margin: 0;
+  font-size: calc(38 * var(--u));
+  line-height: calc(42 * var(--u));
+}
+
+.close {
+  position: absolute;
+  top: calc(14 * var(--u));
+  right: calc(14 * var(--u));
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  color: var(--color-umber);
+  cursor: pointer;
+}
+
+/* Same spot as the Intro page contents: 6 rows of 32 on the ruled area */
+.toc {
+  position: absolute;
+  left: calc(36 * var(--u));
+  right: calc(26 * var(--u));
+  top: calc(210 * var(--u));
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: calc(18 * var(--u));
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  height: calc(32 * var(--u));
+  color: var(--color-umber);
+  text-decoration: none;
+}
+
+.dots {
+  flex: 1;
+  height: 0;
+  margin-top: calc(4 * var(--u));
+  border-bottom: 2px dotted rgba(59, 42, 30, 0.75);
+}
+
+.numeral {
+  min-width: calc(28 * var(--u));
+  text-align: right;
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+.item:hover .itemTitle,
+.item[aria-current="page"] .itemTitle {
+  color: var(--color-madder);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.cover {
+  position: absolute;
+  left: calc(36 * var(--u));
+  bottom: calc(22 * var(--u));
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: calc(15 * var(--u));
+  font-style: italic;
+  color: var(--color-madder);
+  text-decoration: none;
+}
+
+.cover:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
