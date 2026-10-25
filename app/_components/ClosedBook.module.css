@@ -1,0 +1,125 @@
+/* The closed book. Numbers are canvas pixels (500 x 640 book). */
+
+.book {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 500 / 640;
+  color: var(--color-ink);
+  text-decoration: none;
+  container-type: inline-size;
+  /* 1 canvas pixel */
+  --u: calc(100cqw / 500);
+  transition: transform var(--duration-base) var(--ease-arrive);
+}
+
+/* Small lift so it feels like you can pick it up */
+.book:hover {
+  transform: translateY(-4px);
+}
+
+.book:focus-visible {
+  outline-offset: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book {
+    transition: none;
+  }
+  .book:hover {
+    transform: none;
+  }
+}
+
+/* Baked image is bigger than the book (80px extra each side for shadows + ribbon) */
+.texture {
+  position: absolute;
+  left: calc(-80 * var(--u));
+  top: calc(-80 * var(--u));
+  width: calc(660 * var(--u));
+  height: calc(840 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* Leather spine with the sideways title */
+.spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(38 * var(--u));
+  display: grid;
+  place-items: center;
+}
+
+.spineText {
+  transform: rotate(90deg);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: calc(15 * var(--u));
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #c9bca4;
+}
+
+/* Front of the cover, right of the spine */
+.face {
+  position: absolute;
+  left: calc(38 * var(--u));
+  right: 0;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  padding: calc(66 * var(--u)) calc(60 * var(--u)) calc(60 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.kicker {
+  font-size: calc(13 * var(--u));
+  line-height: calc(18 * var(--u));
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #5a4330;
+}
+
+.ornament {
+  width: calc(230 * var(--u));
+  height: calc(34 * var(--u));
+  margin-top: calc(10 * var(--u));
+}
+
+.logo {
+  width: calc(210 * var(--u));
+  height: calc(210 * var(--u));
+  object-fit: contain;
+  margin-top: calc(14 * var(--u));
+  /* Lets the paper stain show through the logo's light parts */
+  mix-blend-mode: multiply;
+}
+
+.title {
+  margin-top: calc(8 * var(--u));
+  font-family: var(--font-display);
+  font-size: calc(72 * var(--u));
+  line-height: calc(76 * var(--u));
+}
+
+.flourish {
+  width: calc(190 * var(--u));
+  height: calc(20 * var(--u));
+  margin-top: calc(8 * var(--u));
+}
+
+.subtitle {
+  margin-top: calc(12 * var(--u));
+  max-width: calc(330 * var(--u));
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: calc(26 * var(--u));
+  line-height: calc(32 * var(--u));
+}

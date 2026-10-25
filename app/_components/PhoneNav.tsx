@@ -11,7 +11,8 @@ import PhoneMenu from "./PhoneMenu";
 import styles from "./PhoneNav.module.css";
 
 // Phone header: logo (to the cover) + Menu button.
-export function PhoneHeader({ current }: { current: ChapterSlug }) {
+// current is empty on the cover page.
+export function PhoneHeader({ current }: { current?: ChapterSlug }) {
   return (
     <div className={styles.header}>
       <Link href={COVER_HREF} className={styles.logo}>

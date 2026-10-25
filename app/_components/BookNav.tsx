@@ -11,12 +11,15 @@ import { ArrowLeft, ArrowRight, Diamond } from "./icons";
 import styles from "./BookNav.module.css";
 
 // Laptop top nav: logo (to the cover) + the six chapters.
-export function BookTopNav({ current }: { current: ChapterSlug }) {
+// On the cover there's no current chapter, and no logo (you're already home).
+export function BookTopNav({ current }: { current?: ChapterSlug }) {
   return (
     <nav aria-label="Main" className={styles.topNav}>
-      <Link href={COVER_HREF} className={styles.logo}>
-        <Image src="/logo-mark.svg" alt="Harbor, back to the cover" width={44} height={48} unoptimized />
-      </Link>
+      {current && (
+        <Link href={COVER_HREF} className={styles.logo}>
+          <Image src="/logo-mark.svg" alt="Harbor, back to the cover" width={44} height={48} unoptimized />
+        </Link>
+      )}
       <ul className={styles.links}>
         {CHAPTERS.map((c) => (
           <li key={c.slug}>

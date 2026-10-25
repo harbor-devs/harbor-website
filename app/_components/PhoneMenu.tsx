@@ -9,7 +9,8 @@ import styles from "./PhoneMenu.module.css";
 // The phone menu: a native <dialog> styled as a Contents page.
 // showModal() gives us for free: focus moves inside, Tab stays inside,
 // Escape closes it, and focus returns to the Menu button after.
-export default function PhoneMenu({ current }: { current: ChapterSlug }) {
+// current is empty on the cover page.
+export default function PhoneMenu({ current }: { current?: ChapterSlug }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -63,9 +64,12 @@ export default function PhoneMenu({ current }: { current: ChapterSlug }) {
             </ol>
           </nav>
 
-          <Link href={COVER_HREF} className={styles.cover} onClick={close}>
-            Close the book
-          </Link>
+          {/* On the cover the book is already closed, so no link back to it */}
+          {current && (
+            <Link href={COVER_HREF} className={styles.cover} onClick={close}>
+              Close the book
+            </Link>
+          )}
         </div>
       </dialog>
     </>
