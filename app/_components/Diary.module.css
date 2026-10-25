@@ -1,0 +1,145 @@
+/* Shared text styles for diary pages. Numbers are canvas pixels.
+   --u comes from BookSpread (laptop) or PhonePage (phone).
+   "Phone" classes exist only where the canvas uses different sizes. */
+
+/* Small red label above a title, like "Chapter I" */
+.kicker {
+  margin: 0;
+  font-size: calc(13 * var(--u));
+  line-height: calc(18 * var(--u));
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-madder);
+}
+
+.kickerPhone {
+  margin: 0;
+  font-size: calc(12 * var(--u));
+  line-height: calc(18 * var(--u));
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-madder);
+}
+
+/* Big page title (left page on laptop).
+   Slight negative spacing keeps "Hello, I'm Abdullah" on one line. */
+.title {
+  margin: calc(12 * var(--u)) 0 0;
+  font-size: calc(48 * var(--u));
+  line-height: calc(56 * var(--u));
+  letter-spacing: -0.01em;
+}
+
+.titlePhone {
+  margin: calc(6 * var(--u)) 0 0;
+  font-size: calc(38 * var(--u));
+  line-height: calc(42 * var(--u));
+  letter-spacing: -0.01em;
+}
+
+/* Smaller title (right page on laptop) */
+.subtitle {
+  margin: calc(12 * var(--u)) 0 0;
+  font-size: calc(32 * var(--u));
+  line-height: calc(40 * var(--u));
+}
+
+/* Ink flourish under a title */
+.flourish {
+  display: block;
+  width: calc(150 * var(--u));
+  height: calc(16 * var(--u));
+  margin-top: calc(10 * var(--u));
+  color: var(--color-ink);
+}
+
+.flourishPhone {
+  display: block;
+  width: calc(150 * var(--u));
+  height: calc(16 * var(--u));
+  margin-top: calc(6 * var(--u));
+  color: var(--color-ink);
+}
+
+/* Ink sketch with its little "fig." label.
+   32px on top centres it between the flourish and the paragraph below. */
+.figure {
+  position: relative;
+  align-self: center;
+  margin: calc(32 * var(--u)) 0 0;
+}
+
+.sketch {
+  display: block;
+  width: calc(396 * var(--u));
+  height: auto;
+}
+
+.figLabel {
+  position: absolute;
+  top: calc(2 * var(--u));
+  right: calc(4 * var(--u));
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: calc(13 * var(--u));
+  line-height: calc(14 * var(--u));
+  color: var(--color-ink-soft);
+}
+
+/* Body text. Size comes from the page itself (18/30 laptop, 17/25 phone). */
+.text {
+  margin: 0;
+}
+
+/* First line pushed in, like a new paragraph in a book */
+.indent {
+  margin: 0;
+  text-indent: 1.5em;
+}
+
+/* Paragraph under a right-page title */
+.lead {
+  margin: calc(42 * var(--u)) 0 0;
+}
+
+/* The one italic line under a phone title */
+.linePhone {
+  margin: calc(12 * var(--u)) 0 0;
+  font-style: italic;
+}
+
+/* Page number at the bottom */
+.folio {
+  margin: auto 0 0;
+  font-size: calc(15 * var(--u));
+  line-height: calc(24 * var(--u));
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+/* Text that sits on the paper's ruled lines (laptop pages).
+   Lines are 30px apart, first one at 186.5px from the paper top.
+   Set --row on the element: 0 = first line, 1 = second, and so on.
+   Everything inside must be 30px rows so it never drifts off the lines. */
+.ruled {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Same side margins as the page it's on */
+  padding-left: inherit;
+  padding-right: inherit;
+  top: calc((164 + 30 * var(--row, 0)) * var(--u));
+  line-height: calc(30 * var(--u));
+}
+
+.ruled > * {
+  margin: 0;
+}
+
+/* The dot between words in a kicker ("Chapter I · Introduction").
+   A normal dot sits at lowercase height, this lifts it to the middle of capitals. */
+.sep {
+  display: inline-block;
+  margin: 0 0.3em;
+  transform: translateY(-0.12em);
+}

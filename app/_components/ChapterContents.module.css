@@ -1,0 +1,84 @@
+/* Contents list. Numbers are canvas pixels (--u). */
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  gap: calc(8 * var(--u));
+  color: inherit;
+  text-decoration: none;
+}
+
+.dots {
+  flex: 1;
+  height: 0;
+  border-bottom: 2px dotted rgba(59, 42, 30, 0.75);
+}
+
+.numeral {
+  min-width: calc(28 * var(--u));
+  text-align: right;
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+.item:hover .itemTitle,
+.item:focus-visible .itemTitle {
+  color: var(--color-madder);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+/* Brass focus ring is too faint on paper */
+.item:focus-visible {
+  outline-color: var(--color-madder);
+}
+
+/* Laptop: lives inside a .ruled block, so every row is one 30px line.
+   One empty line above "Contents", then one line per chapter. */
+.heading {
+  margin: calc(30 * var(--u)) 0 0;
+  font-size: calc(22 * var(--u));
+  line-height: calc(30 * var(--u));
+  font-style: italic;
+}
+
+.book .list {
+  font-size: calc(19 * var(--u));
+}
+
+.book .item {
+  height: calc(30 * var(--u));
+  align-items: baseline;
+}
+
+.book .dots {
+  align-self: center;
+  margin-top: calc(8 * var(--u));
+}
+
+/* Phone: pinned to the ruled area of the page, 6 rows of 32 */
+.phone {
+  position: absolute;
+  left: calc(36 * var(--u));
+  right: calc(26 * var(--u));
+  top: calc(210 * var(--u));
+}
+
+.phone .list {
+  font-size: calc(18 * var(--u));
+}
+
+.phone .item {
+  height: calc(32 * var(--u));
+  align-items: center;
+}
+
+.phone .dots {
+  margin-top: calc(4 * var(--u));
+}

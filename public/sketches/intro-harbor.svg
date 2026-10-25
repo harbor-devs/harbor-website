@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="396" height="184" viewBox="0 0 396 184" fill="none" stroke="#4A3220" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="inkWobble" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="21" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </defs>
+  <g filter="url(#inkWobble)">
+    <g stroke-opacity="0.38" stroke-width="0.8">
+      <path d="M4 90C18 84 28 72 40 70C50 68 56 78 66 76C78 72 86 56 100 52C112 49 120 62 128 66C136 70 142 68 150 72"></path>
+      <path d="M246 70C256 64 266 52 280 50C292 48 298 60 308 62C320 64 330 56 342 58C356 60 366 74 380 78C386 80 390 84 394 86"></path>
+      <path d="M88 62l-6 10M94 58l-7 12M100 56l-7 13M106 58l-6 11M112 60l-5 9M286 54l-6 10M292 56l-6 10M298 60l-5 8M348 62l-5 9M354 64l-5 9"></path>
+    </g>
+    <g stroke-opacity="0.55" stroke-width="1">
+      <path d="M0 116C20 108 36 98 54 96C70 94 80 104 96 104C116 104 128 92 146 96"></path>
+      <path d="M250 98C266 92 280 100 296 102C316 104 330 94 350 96C366 98 380 106 396 110"></path>
+      <path d="M50 96V80H58V96M48 80H60M50 80V77M54 80V77M58 80V77M54 77V68M54 68l6 3l-6 2"></path>
+      <path d="M14 112l8 -4M24 110l10 -5M70 102l10 -3M290 104l10 -3M332 100l10 -3M360 102l10 -2"></path>
+    </g>
+    <g stroke-opacity="0.6" stroke-width="1">
+      <path d="M150 100C160 106 164 116 158 126C150 140 138 150 132 162C126 172 118 178 108 184"></path>
+      <path d="M246 100C238 110 240 122 250 132C262 146 280 156 290 166C298 174 306 180 316 184"></path>
+      <path d="M150 172h14M176 176h18M210 170h16M232 178h14M196 182h12" stroke-opacity="0.4"></path>
+    </g>
+    <g stroke-opacity="0.55" stroke-width="1">
+      <path d="M0 148C30 140 60 142 90 150C100 153 110 158 118 164"></path>
+      <path d="M396 146C366 138 340 142 316 152C306 156 300 160 296 166"></path>
+      <path d="M10 160l14 -6M22 166l16 -7M36 172l16 -7M50 178l14 -6M370 158l14 -6M356 166l16 -7M342 174l16 -7M330 180l14 -6" stroke-opacity="0.4"></path>
+    </g>
+    <g stroke-opacity="0.6" stroke-width="0.9">
+      <path d="M326 132c-6 -2 -8 -10 -2 -14c0 -7 9 -9 12 -3c6 -2 10 6 5 10c3 5 -3 10 -8 7c-2 2 -5 2 -7 0ZM330 132V142"></path>
+      <path d="M352 128c-5 -2 -6 -9 -1 -12c1 -6 8 -7 10 -2c5 -1 8 5 4 8c2 4 -3 8 -7 6ZM356 128V138"></path>
+      <path d="M372 136c-4 -1 -5 -7 0 -9c1 -5 7 -5 8 -1c4 0 6 5 2 7c1 3 -3 5 -6 4ZM375 136V144"></path>
+      <path d="M24 130C20 120 22 104 26 96C30 104 32 120 28 130ZM26 130V138"></path>
+      <path d="M36 132C33 124 34 112 37 106C40 112 42 124 39 132ZM37 132V138"></path>
+    </g>
+    <path d="M300 28c3 -3 6 -3 8 0c2 -3 5 -3 8 0M322 20c2 -2 4 -2 6 0c2 -2 4 -2 6 0M76 30c3 -3 6 -3 8 0c2 -3 5 -3 8 0" stroke-opacity="0.5" stroke-width="0.8"></path>
+    <g stroke-opacity="0.34" stroke-width="0.8">
+      <path d="M150 72C164 60 180 44 198 38C216 44 232 58 246 70"></path>
+      <path d="M180 50l-6 10M186 46l-7 12M192 42l-7 13M198 40l-6 12M204 43l-5 10"></path>
+    </g>
+    <g stroke-opacity="0.55" stroke-width="1">
+      <path d="M150 100C164 94 176 90 189 84M246 100C232 94 218 90 205 84"></path>
+      <path d="M186 96h10M180 106h14M204 104h12M176 154h16M220 160h14" stroke-opacity="0.4"></path>
+      <path d="M144 134C180 129 226 129 262 134M144 134V152M262 134V152M144 152C148 140 168 140 172 152M172 152C178 137 228 137 234 152M234 152C238 140 258 140 262 152"></path>
+      <path d="M150 158h12M184 160h16M210 158h14M240 160h12" stroke-opacity="0.35"></path>
+    </g>
+  </g>
+</svg>
