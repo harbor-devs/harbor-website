@@ -43,3 +43,9 @@ These have no filters in the mockup, so they stay as CSS:
 ## Not baked yet
 
 Closed cover, back cover and the thank-you flower. Bake them when those parts get built.
+
+## Changes
+
+- Oct 25, 2026: re-baked `paper-spread.webp` and all six `page-phone-*.webp`
+  with darker ruled lines (laptop rule opacity 0.5 to 0.9, phone 0.6 to 1.0).
+  Same method and settings as above, nothing else changed.
