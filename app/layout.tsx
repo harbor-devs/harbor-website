@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { EB_Garamond, IM_Fell_English } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-import PageTurner from "./_components/PageTurner";
 
 // Body text font
 const garamond = EB_Garamond({
@@ -32,21 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${garamond.variable} ${fell.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <header>
-          <nav aria-label="Main" className="flex items-center gap-6 p-4">
-            <Link href="/">Harbor</Link>
-            <ul className="flex gap-4">
-              <li><Link href="/">Home</Link></li>
-              <li><Link href="/portfolio">Portfolio</Link></li>
-              <li><Link href="/services">Services</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
-            </ul>
-          </nav>
-        </header>
-        {children}
-        <PageTurner />
-      </body>
+      <body className="min-h-dvh flex flex-col">{children}</body>
     </html>
   );
 }

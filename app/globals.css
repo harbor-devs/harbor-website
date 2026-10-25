@@ -13,6 +13,10 @@
   --color-umber: #2a1f14;
   --color-brass: #a8823c;
   --color-hairline: rgba(59, 42, 30, 0.25);
+    --color-desk: #533c28;
+
+  /* Book layout switches from one page to the two-page spread here */
+  --breakpoint-book: 900px;
 
   /* Shadows */
   --shadow-haze-page: inset 0 0 90px rgba(42, 31, 20, 0.35);
@@ -40,11 +44,22 @@
 }
 
 body {
-  background: var(--color-paper);
+  /* Desk. The color shows instantly while the image loads. */
+  background-color: var(--color-desk);
+  background-image: url("/textures/desk-phone.webp");
+  background-size: cover;
+  background-position: center;
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: 18px;
   line-height: 30px;
+}
+
+/* 900px = --breakpoint-book (CSS media queries can't read variables) */
+@media (width >= 900px) {
+  body {
+    background-image: url("/textures/desk-laptop.webp");
+  }
 }
 
 h1,
