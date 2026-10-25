@@ -47,14 +47,23 @@
   position: absolute;
   top: calc(12 * var(--u));
   width: calc(520 * var(--u));
-  height: calc(640 * var(--u));
-  background: #d9c8a6;
+  /* Taller than the paper so 8px of page edges show at the bottom */
+  height: calc(644 * var(--u));
+  /* Fine cream and tan lines, like the edges of a real paper stack */
+  background: repeating-linear-gradient(
+    to top,
+    #e8dabd 0,
+    #e8dabd calc(1.2 * var(--u)),
+    #bba57d calc(1.2 * var(--u)),
+    #bba57d calc(2 * var(--u))
+  );
 }
 
 .stackLeft {
   left: calc(10 * var(--u));
   border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
   box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
     calc(-1 * var(--u)) var(--u) 0 #e6d8bc,
     calc(-2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
     calc(-3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
@@ -65,6 +74,7 @@
   right: calc(10 * var(--u));
   border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
   box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
     var(--u) var(--u) 0 #e6d8bc,
     calc(2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
     calc(3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
@@ -92,7 +102,11 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  color: var(--color-ink);
+  /* Text: darkest ink, slightly heavier, scales with the book */
+  color: var(--color-umber);
+  font-weight: 500;
+  font-size: calc(18 * var(--u));
+  line-height: calc(30 * var(--u));
 }
 
 .pageLeft {
