@@ -1,0 +1,106 @@
+/* Laptop two-page spread. All numbers are canvas pixels
+   from "Harbor diary, final" (1060 x 664 book). */
+
+.stage {
+  /* Space kept free for the top nav and bottom bar (built later) */
+  --chrome-top: 68px;
+  --chrome-bottom: 68px;
+  /* Biggest the book may grow on large monitors */
+  --book-max: 1200px;
+
+  flex: 1;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: var(--chrome-top) 16px var(--chrome-bottom);
+}
+
+.book {
+  position: relative;
+  /* Whichever runs out first: max size, screen width, or screen height */
+  width: min(
+    var(--book-max),
+    100%,
+    calc((100dvh - var(--chrome-top) - var(--chrome-bottom)) * 1060 / 664)
+  );
+  aspect-ratio: 1060 / 664;
+
+  /* Children measure themselves against this box */
+  container-type: inline-size;
+  /* 1 canvas pixel. Only used by children, never by .book itself. */
+  --u: calc(100cqw / 1060);
+}
+
+.board {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(6 * var(--u));
+  background: linear-gradient(180deg, #5e4428, #3e2a16);
+  box-shadow:
+    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
+    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+}
+
+/* Page stacks peeking out under the paper */
+.stackLeft,
+.stackRight {
+  position: absolute;
+  top: calc(12 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+  background: #d9c8a6;
+}
+
+.stackLeft {
+  left: calc(10 * var(--u));
+  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
+  box-shadow:
+    calc(-1 * var(--u)) var(--u) 0 #e6d8bc,
+    calc(-2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(-3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(-4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
+}
+
+.stackRight {
+  right: calc(10 * var(--u));
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  box-shadow:
+    var(--u) var(--u) 0 #e6d8bc,
+    calc(2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
+}
+
+/* The baked paper texture (both pages in one image) */
+.paper {
+  position: absolute;
+  left: calc(10 * var(--u));
+  top: calc(8 * var(--u));
+  width: calc(1040 * var(--u));
+  height: calc(640 * var(--u));
+  border-radius: calc(3 * var(--u));
+  background: url("/textures/paper-spread.webp") 0 0 / 100% 100% no-repeat;
+}
+
+/* The two text areas, padding copied from the canvas */
+.pageLeft,
+.pageRight {
+  position: absolute;
+  top: calc(8 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-ink);
+}
+
+.pageLeft {
+  left: calc(10 * var(--u));
+  padding: calc(52 * var(--u)) calc(64 * var(--u)) calc(48 * var(--u)) calc(60 * var(--u));
+}
+
+.pageRight {
+  left: calc(530 * var(--u));
+  padding: calc(52 * var(--u)) calc(60 * var(--u)) calc(48 * var(--u)) calc(64 * var(--u));
+}
