@@ -67,7 +67,7 @@
   position: absolute;
   left: calc(36 * var(--u));
   right: calc(26 * var(--u));
-  top: calc(210 * var(--u));
+    top: calc(216 * var(--u));
 }
 
 .phone .list {
