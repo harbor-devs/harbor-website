@@ -49,3 +49,12 @@ Closed cover, back cover and the thank-you flower. Bake them when those parts ge
 - Oct 25, 2026: re-baked `paper-spread.webp` and all six `page-phone-*.webp`
   with darker ruled lines (laptop rule opacity 0.5 to 0.9, phone 0.6 to 1.0).
   Same method and settings as above, nothing else changed.
+  ## Re-bake: darker ruled lines (Oct 25, 2026)
+
+All 7 paper textures were re-baked with darker ruled lines so the pages read more clearly.
+
+- Laptop spread textures: ruled line opacity 0.9
+- Phone page textures: ruled line opacity 1.0
+
+Reason: after the design lock, the lines looked too faint on real screens (picked option C).
+Note: the Claude Design canvas still shows the older, lighter lines. Update it after Step 4.
