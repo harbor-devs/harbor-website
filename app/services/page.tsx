@@ -1,8 +1,5 @@
+import PlaceholderChapter from "../_components/PlaceholderChapter";
+
 export default function ServicesPage() {
-  return (
-    <main>
-      <h1>Services</h1>
-      <p>Placeholder page. Real services will go here.</p>
-    </main>
-  );
+  return <PlaceholderChapter slug="services" />;
 }
