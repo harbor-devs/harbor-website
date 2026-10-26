@@ -42,4 +42,10 @@
   line-height: 24px;
   font-style: italic;
   color: #c9bca4;
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.hint:hover {
+  color: var(--color-paper);
 }

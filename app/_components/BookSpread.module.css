@@ -2,19 +2,18 @@
    from "Harbor diary, final" (1060 x 664 book). */
 
 .stage {
-  /* Space kept free for the top nav and bottom bar (built later) */
+  /* Space kept free for the top nav and bottom bar */
   --chrome-top: 68px;
   --chrome-bottom: 68px;
   /* Biggest the book may grow on large monitors */
   --book-max: 1200px;
 
   flex: 1;
-    position: relative;
+  position: relative;
   display: grid;
   place-items: center;
   box-sizing: border-box;
   padding: var(--chrome-top) 16px var(--chrome-bottom);
-
 }
 
 .book {
@@ -43,12 +42,31 @@
     0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
 }
 
-/* Page stacks peeking out under the paper */
+/* One sheet per side: the page plus the stack edges peeking out under it.
+   The sheet is what turns, so the edges always travel with their page. */
+.sheetLeft,
+.sheetRight {
+  position: absolute;
+  top: calc(8 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+}
+
+.sheetLeft {
+  left: calc(10 * var(--u));
+}
+
+.sheetRight {
+  left: calc(530 * var(--u));
+}
+
+/* Page stacks peeking out under the paper (positions are inside the sheet) */
 .stackLeft,
 .stackRight {
   position: absolute;
-  top: calc(12 * var(--u));
-  width: calc(520 * var(--u));
+  left: 0;
+  top: calc(4 * var(--u));
+  width: 100%;
   /* Taller than the paper so 8px of page edges show at the bottom */
   height: calc(644 * var(--u));
   /* Fine cream and tan lines, like the edges of a real paper stack */
@@ -62,7 +80,6 @@
 }
 
 .stackLeft {
-  left: calc(10 * var(--u));
   border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
   box-shadow:
     inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
@@ -73,7 +90,6 @@
 }
 
 .stackRight {
-  right: calc(10 * var(--u));
   border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
   box-shadow:
     inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
@@ -83,41 +99,35 @@
     calc(4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
 }
 
-/* The baked paper texture (both pages in one image) */
-.paper {
-  position: absolute;
-  left: calc(10 * var(--u));
-  top: calc(8 * var(--u));
-  width: calc(1040 * var(--u));
-  height: calc(640 * var(--u));
-  border-radius: calc(3 * var(--u));
-  background: url("/textures/paper-spread.webp") 0 0 / 100% 100% no-repeat;
-}
-
-/* The two text areas, padding copied from the canvas */
+/* The two pages, padding copied from the canvas.
+   Each one paints its half of the baked paper image. */
 .pageLeft,
 .pageRight {
   position: absolute;
-  top: calc(8 * var(--u));
-  width: calc(520 * var(--u));
-  height: calc(640 * var(--u));
+  inset: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  background-image: url("/textures/paper-spread.webp");
+  /* The image covers both pages, so each page shows half of it */
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
   /* Text: darkest ink, slightly heavier, scales with the book */
-    color: var(--color-ink);
+  color: var(--color-ink);
   font-weight: 500;
   font-size: calc(18 * var(--u));
   line-height: calc(30 * var(--u));
 }
 
 .pageLeft {
-  left: calc(10 * var(--u));
+  background-position: left top;
+  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
   padding: calc(52 * var(--u)) calc(64 * var(--u)) calc(48 * var(--u)) calc(60 * var(--u));
 }
 
 .pageRight {
-  left: calc(530 * var(--u));
+  background-position: right top;
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
   padding: calc(52 * var(--u)) calc(60 * var(--u)) calc(48 * var(--u)) calc(64 * var(--u));
 }
 

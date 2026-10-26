@@ -53,3 +53,17 @@ export function getChapterNav(slug: ChapterSlug) {
 
 // The object getChapterNav returns, so components can type their props.
 export type ChapterNav = ReturnType<typeof getChapterNav>;
+
+// Which way the paper turns when you go from one place to another.
+// "cover" means the closed book at "/". Same place = no turn.
+export type TurnType = "turn-forward" | "turn-back" | "open-book" | "close-book";
+
+export function turnTypes(from: ChapterSlug | "cover", to: ChapterSlug | "cover"): TurnType[] {
+  if (from === to) return [];
+  if (from === "cover") return ["open-book"];
+  if (to === "cover") return ["close-book"];
+
+  const fromIndex = CHAPTERS.findIndex((c) => c.slug === from);
+  const toIndex = CHAPTERS.findIndex((c) => c.slug === to);
+  return [toIndex > fromIndex ? "turn-forward" : "turn-back"];
+}
