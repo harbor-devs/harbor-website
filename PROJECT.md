@@ -106,18 +106,14 @@ Every chapter URL must work when opened directly or refreshed.
 
 Follow in order. Each step is discussed, built, tested and committed.
 
-### Phase 0: clean start
+### Phase 0: clean start (done 2026-10-26)
 - [x] Discard the uncommitted closing-fade experiment
 - [x] Create the `book-engine` branch
-- [ ] Write PROJECT.md, CLAUDE.md, README.md
-- [ ] Leftovers:
-  - [ ] Check for stray `console.log` lines
-  - [ ] Change the tab title from "Create Next App" to Harbor
-  - [ ] Review the `unrs-resolver` install script before allowing it
-  - [ ] Decide on Next.js telemetry
-  - [ ] Decide on `experimental.agentFeedback` in `next.config.ts`
-  - [ ] Remove the unused default Next.js files in `public/`
-  - [ ] Tidy `docs/textures.md` (duplicated section, cover is now baked)
+- [x] Write PROJECT.md, CLAUDE.md, README.md
+- [x] Leftovers: no stray `console.log`, tab title already Harbor, default
+      Next.js files removed, `docs/textures.md` tidied, telemetry turned off,
+      `experimental.agentFeedback` removed
+- Moved to Phase 4: review the `unrs-resolver` install script
 
 ### Phase 1: book engine (laptop)
 - [ ] Plan the engine: one book stays on screen, real pages turn, the URL
@@ -128,7 +124,7 @@ Follow in order. Each step is discussed, built, tested and committed.
       scroll to turn, dragging the page, browser back and forward
 - [ ] Always-visible menu, page marker, "scroll or swipe to turn" hint on page 1
 - [ ] Reduced motion: plain swap
-- [ ] Cover opening (designed together first)
+- [ ] Cover opening (designed together first; also fix the `cover-logo.svg` width/height warning)
 - [ ] Closing and back cover
 - [ ] Animated flower thank-you at the end
 
@@ -157,6 +153,7 @@ Follow in order. Each step is discussed, built, tested and committed.
 - [ ] Final visual pass (vintage textures, nothing flat)
 - [ ] Accessibility check
 - [ ] Speed check
+- [ ] Review the `unrs-resolver` install script before allowing it
 - [ ] SEO, favicon from the small logo mark, link previews
 - [ ] Update the design canvas to match the code
 - [ ] QA review (report only)
@@ -165,13 +162,18 @@ Follow in order. Each step is discussed, built, tested and committed.
 - [ ] Test on Firefox, Chrome, Edge and phone
 - [ ] Merge `book-engine` into `main`
 - [ ] Choose a host (check current terms first) and make the repo public
+- [ ] Add a license (default plan: all rights reserved)
 - [ ] Later: domain, professional email
 
 ## Decisions log
 
 - 2026-10-25: Tailwind runs through PostCSS. The default Turbopack CSS rule
   broke CSS Modules (empty styles).
-- 2026-10-25: Textures are baked images. Live SVG filters were too slow for page flips.
+- 2026-10-25: Textures are baked images instead of live SVG filters, so the
+  browser doesn't redraw them every frame (smoother on phones and page flips).
 - 2026-10-26: Replaced the route-level View Transitions with a custom book
   engine. The whole page moved, and the cover and closing animations felt
   glitchy. One book that stays on screen allows real page turns.
+- 2026-10-26: Turned off Next.js telemetry and removed `experimental.agentFeedback`
+  (privacy first; CLAUDE.md already gives AI tools their instructions).
+  
