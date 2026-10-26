@@ -176,4 +176,3 @@ Follow in order. Each step is discussed, built, tested and committed.
   glitchy. One book that stays on screen allows real page turns.
 - 2026-10-26: Turned off Next.js telemetry and removed `experimental.agentFeedback`
   (privacy first; CLAUDE.md already gives AI tools their instructions).
-  
