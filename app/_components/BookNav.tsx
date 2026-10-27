@@ -4,7 +4,6 @@ import {
   BACK_COVER_HREF,
   CHAPTERS,
   COVER_HREF,
-  turnTypes,
   type ChapterNav,
   type ChapterSlug,
 } from "../_lib/chapters";
@@ -14,13 +13,10 @@ import styles from "./BookNav.module.css";
 // Laptop top nav: logo (to the cover) + the six chapters.
 // On the cover there's no current chapter, and no logo (you're already home).
 export function BookTopNav({ current }: { current?: ChapterSlug }) {
-  // Where we are right now, for working out which way the page turns
-  const from = current ?? "cover";
-
   return (
     <nav aria-label="Main" className={styles.topNav}>
       {current && (
-        <Link href={COVER_HREF} className={styles.logo} transitionTypes={turnTypes(from, "cover")}>
+        <Link href={COVER_HREF} className={styles.logo}>
           <Image src="/logo-mark.svg" alt="Harbor, back to the cover" width={44} height={48} unoptimized />
         </Link>
       )}
@@ -31,7 +27,6 @@ export function BookTopNav({ current }: { current?: ChapterSlug }) {
               href={c.href}
               className={styles.link}
               aria-current={c.slug === current ? "page" : undefined}
-              transitionTypes={turnTypes(from, c.slug)}
             >
               {c.navLabel}
             </Link>
@@ -49,11 +44,7 @@ export function BookBottomBar({ nav }: { nav: ChapterNav }) {
 
   return (
     <nav aria-label="Chapter" className={styles.bar}>
-      <Link
-        href={prev ? prev.href : COVER_HREF}
-        className={styles.barLink}
-        transitionTypes={turnTypes(chapter.slug, prev ? prev.slug : "cover")}
-      >
+      <Link href={prev ? prev.href : COVER_HREF} className={styles.barLink}>
         <ArrowLeft />
         {prev ? prev.title : "Close the book"}
       </Link>
@@ -64,15 +55,10 @@ export function BookBottomBar({ nav }: { nav: ChapterNav }) {
         {chapter.title}
       </p>
 
-      <Link
-        href={next ? next.href : BACK_COVER_HREF}
-        className={styles.barLink}
-        transitionTypes={turnTypes(chapter.slug, next ? next.slug : "cover")}
-      >
+      <Link href={next ? next.href : BACK_COVER_HREF} className={styles.barLink}>
         {next ? next.title : "Close the book"}
         <ArrowRight />
       </Link>
     </nav>
   );
 }
-

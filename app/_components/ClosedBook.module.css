@@ -31,18 +31,6 @@
   }
 }
 
-/* Invisible 1px marker. It pairs with the left page so React can unfold
-   Introduction's left page from the spine when the book opens (see ClosedBook). */
-.marker {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Baked image is bigger than the book (80px extra each side for shadows + ribbon) */
 .texture {
   position: absolute;
