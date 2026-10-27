@@ -20,7 +20,7 @@ const fell = IM_Fell_English({
 });
 
 export const metadata: Metadata = {
-  title: "Harbor",
+    title: { default: "Harbor", template: "%s · Harbor" },
   description: "Harbor, by Abdullah Saghir.",
 };
 
