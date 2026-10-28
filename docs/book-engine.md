@@ -43,5 +43,7 @@ How the Harbor diary turns pages. Read this before changing anything in the book
    Working: bottom bar arrows, top nav riffle, drag, corner click, keyboard arrows, scroll to turn, Back/Forward.
    At the first and last chapter the keys and scroll do nothing on purpose (cover and closing come in step 5).
    Keyboard and scroll live in app/_components/Book.tsx. They only change the URL, the engine does the turning.
-4. Menu, page marker, "scroll or swipe" hint.
+4. Menu, page marker, "scroll or swipe" hint. DONE (Oct 28 2026)
+   Menu: top nav + bottom bar always visible. Marker: "2 of 6" under the chapter name in the bottom bar.
+   Hint: shows on the first chapter in the top bar until the first turn (hidden under 1200px wide).
 5. Cover opening, closing, flower thank-you (design each together first).
