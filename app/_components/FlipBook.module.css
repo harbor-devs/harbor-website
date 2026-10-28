@@ -1,0 +1,61 @@
+/* The turning pages. The page-flip library positions and draws each leaf
+   with inline styles, so these rules only matter before it starts
+   (and for what's INSIDE a leaf, which it never touches). */
+
+.host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* The library's fold shadow leaks a 1px line past the pages; trim it */
+  overflow: hidden;
+}
+
+/* One leaf = one page. Only the URL's two pages show until the library starts. */
+.leaf {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: none;
+}
+.leaf[data-shown] {
+  display: block;
+}
+.leaf[data-side="left"] {
+  left: 0;
+}
+.leaf[data-side="right"] {
+  left: 50%;
+}
+
+/* The paper itself, padding copied from the canvas.
+   Each page paints its half of the baked paper image. */
+.pageLeft,
+.pageRight {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-image: url("/textures/paper-spread.webp");
+  /* The image covers both pages, so each page shows half of it */
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  /* Text: darkest ink, slightly heavier, scales with the book */
+  color: var(--color-ink);
+  font-weight: 500;
+  font-size: calc(18 * var(--u));
+  line-height: calc(30 * var(--u));
+}
+
+.pageLeft {
+  background-position: left top;
+  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
+  padding: calc(52 * var(--u)) calc(64 * var(--u)) calc(48 * var(--u)) calc(60 * var(--u));
+}
+
+.pageRight {
+  background-position: right top;
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  padding: calc(52 * var(--u)) calc(60 * var(--u)) calc(48 * var(--u)) calc(64 * var(--u));
+}

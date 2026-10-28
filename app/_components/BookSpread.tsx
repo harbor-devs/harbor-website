@@ -2,34 +2,23 @@ import type { ReactNode } from "react";
 import styles from "./BookSpread.module.css";
 
 type BookSpreadProps = {
-  left: ReactNode;
-  right: ReactNode;
+  children: ReactNode; // the pages (FlipBook)
   header?: ReactNode; // goes in the free space above the book
   footer?: ReactNode; // goes in the free space under the book, same width as the book
 };
 
-// The open book on laptop: board, then two sheets (page stack edges + page).
+// The open book on laptop: board, page stack edges, then the pages on top.
 // Decoration is aria-hidden so screen readers only hear the content.
-export default function BookSpread({ left, right, header, footer }: BookSpreadProps) {
+export default function BookSpread({ children, header, footer }: BookSpreadProps) {
   return (
     <div className={styles.stage}>
       {header && <header className={styles.header}>{header}</header>}
       <main className={styles.book}>
         <div aria-hidden="true" className={styles.board} />
+        <div aria-hidden="true" className={styles.stackLeft} />
+        <div aria-hidden="true" className={styles.stackRight} />
 
-        <div className={styles.sheetLeft}>
-          <div aria-hidden="true" className={styles.stackLeft} />
-          <section aria-label="Left page" className={styles.pageLeft}>
-            {left}
-          </section>
-        </div>
-
-        <div className={styles.sheetRight}>
-          <div aria-hidden="true" className={styles.stackRight} />
-          <section aria-label="Right page" className={styles.pageRight}>
-            {right}
-          </section>
-        </div>
+        <div className={styles.pages}>{children}</div>
 
         {footer && <div className={styles.footer}>{footer}</div>}
       </main>

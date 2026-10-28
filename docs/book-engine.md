@@ -20,6 +20,13 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 - Calling a turn while a page is still turning force-finishes the first turn and glitches. This made the Back button sometimes go forward.
 - Its "go to page X" jumps to the page next to X and animates only one turn.
 - On phone (portrait mode) it copies page elements.
+- It moves our page elements into its own wrapper. On unmount we call clear() to put them back, or React crashes.
+- Its drawing loop never stops. On unmount we replace its render function with an empty one.
+- It ships no TypeScript types. Ours are in types/page-flip.d.ts (only what we use).
+- It fires "read" a moment before its own state updates, so we wait one tick (queueMicrotask).
+- Its hover fold follows the mouse. We patch showCorner so it lifts once and holds still.
+- Its fold shadow leaks a 1px line past the pages. .host has overflow: hidden.
+- All of this lives in app/_components/FlipBook.tsx only.
 
 ## Our rules to avoid those bugs
 
@@ -30,8 +37,10 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 
 ## Build order (Phase 1, laptop)
 
-1. One shared book, every URL shows the right spread. No animation.
-2. Page turn with the library + the waiting rule above.
+1. One shared book, every URL shows the right spread. No animation. DONE (Oct 27 2026)
+2. Page turn with the library + the waiting rule above. DONE (Oct 27 2026)
 3. All the ways to turn: arrows, top nav (riffle), keyboard, Back/Forward, scroll, drag.
+   Already working: bottom bar arrows, top nav riffle, drag, corner click.
+   Still to do: keyboard arrows, scroll to turn, test Back/Forward properly.
 4. Menu, page marker, "scroll or swipe" hint.
 5. Cover opening, closing, flower thank-you (design each together first).
