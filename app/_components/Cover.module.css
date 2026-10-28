@@ -1,18 +1,13 @@
-/* Cover layout: nav on top, book in the middle, hint under it. */
+/* Phone cover layout: header on top, book in the middle, hint under it.
+   Also the laptop "Click to open" hint. */
 
 .stage {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Space taken by nav + hint + ribbon, so the book always fits the screen */
+  /* Space taken by header + hint + ribbon, so the book always fits the screen */
   --chrome: 260px;
-}
-
-@media (width >= 900px) {
-  .stage {
-    --chrome: 200px;
-  }
 }
 
 .header {
@@ -48,4 +43,17 @@
 
 .hint:hover {
   color: var(--color-paper);
+}
+
+/* Laptop: under the closed cover, which sits on the right half of the book */
+.hintSlot {
+  margin-left: 50%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  padding-top: 28px;
+}
+
+.hintSlot .hint {
+  margin: 0;
 }

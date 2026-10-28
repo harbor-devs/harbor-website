@@ -4,12 +4,23 @@ import { CHAPTERS } from "../_lib/chapters";
 import Flourish from "./Flourish";
 import styles from "./ClosedBook.module.css";
 
+type ClosedBookProps = {
+  // Only the cover board itself: no page edges, ribbon or shadow around it.
+  // The swinging cover uses this, because those parts stay with the pages.
+  bare?: boolean;
+};
+
 // The closed diary on the cover page. The whole book is one link to chapter one.
 // The look (spine, paper, frame, ribbon) is one baked image; the text is real HTML on top.
 // Cover text is aria-hidden: the page has its own hidden <h1>, and the link says what it does.
-export default function ClosedBook() {
+export default function ClosedBook({ bare = false }: ClosedBookProps) {
   return (
-    <Link href={CHAPTERS[0].href} className={styles.book} aria-label="Open the book">
+    <Link
+      href={CHAPTERS[0].href}
+      className={styles.book}
+      data-bare={bare || undefined}
+      aria-label="Open the book"
+    >
       <span aria-hidden="true" className={styles.texture} />
 
       <span aria-hidden="true" className={styles.spine}>

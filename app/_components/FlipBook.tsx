@@ -9,8 +9,9 @@ import styles from "./FlipBook.module.css";
 
 type FlipBookProps = {
   pages: ReactNode[]; // every page in reading order: chapter 1 left, chapter 1 right, chapter 2 left...
-  spread: number; // the two-page spread the URL wants (0 = first chapter)
+  spread: number; // the two-page spread the book should turn to (0 = first chapter)
   onUserTurn: (spread: number) => void; // the visitor dragged a page over by hand
+  onArrive: (spread: number) => void; // a turn finished, the book now shows this spread
 };
 
 const PAGE_W = 520; // one page, canvas px (shape only, the book scales)
@@ -18,14 +19,14 @@ const PAGE_H = 640;
 const TURN_MS = 700; // a normal turn (same as --duration-page)
 const RIFFLE_MS = 300; // each turn while skipping through several chapters
 
-export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
+export default function FlipBook({ pages, spread, onUserTurn, onArrive }: FlipBookProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<PageFlip | null>(null);
   // True while a turn WE started is running, so we can tell it apart from the visitor's
   const engineTurning = useRef(false);
 
   // The waiting rule: never start a turn while one is running.
-  // Turn ONE page toward the URL's spread. When that turn ends, this runs again,
+  // Turn ONE page toward the wanted spread. When that turn ends, this runs again,
   // until the book is there. Big jumps become a riffle.
   const turnTowardUrl = useEffectEvent((instant: boolean) => {
     const flip = flipRef.current;
@@ -35,6 +36,7 @@ export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
     const at = flip.getCurrentPageIndex() / 2;
     if (at === spread) {
       engineTurning.current = false;
+      onArrive(at);
       return;
     }
 
@@ -42,6 +44,7 @@ export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
     const noMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (instant || noMotion || host.offsetWidth === 0) {
       flip.turnToPage(spread * 2);
+      onArrive(spread);
       return;
     }
 
@@ -57,6 +60,7 @@ export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
     if (!flip) return;
 
     const at = flip.getCurrentPageIndex() / 2;
+    onArrive(at);
     if (!engineTurning.current && at !== spread) {
       onUserTurn(at); // the visitor turned it: move the URL to match
       return;
@@ -123,7 +127,7 @@ export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
     };
   }, []);
 
-  // The URL changed: turn toward it (or wait, if a turn is running)
+  // The wanted spread changed: turn toward it (or wait, if a turn is running)
   useEffect(() => {
     turnTowardUrl(false);
   }, [spread]);
@@ -132,7 +136,7 @@ export default function FlipBook({ pages, spread, onUserTurn }: FlipBookProps) {
     <div ref={hostRef} className={styles.host}>
       {pages.map((page, i) => {
         const isLeft = i % 2 === 0;
-        // Before the library starts, only the URL's two pages show
+        // Before the library starts, only the wanted two pages show
         const shown = Math.floor(i / 2) === spread;
         return (
           <div key={i} className={styles.leaf} data-side={isLeft ? "left" : "right"} data-shown={shown || undefined}>

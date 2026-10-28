@@ -42,6 +42,11 @@
   pointer-events: none;
 }
 
+/* Bare: cut the image down to the cover board (drops page edges, ribbon, shadow) */
+.book[data-bare] .texture {
+  clip-path: inset(calc(80 * var(--u)));
+}
+
 /* Leather spine with the sideways title */
 .spine {
   position: absolute;

@@ -1,11 +1,12 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { CHAPTERS, COVER_HREF, getChapterNav, type ChapterSlug } from "../_lib/chapters";
 import { BookBottomBar, BookTopNav } from "./BookNav";
 import BookSpread from "./BookSpread";
-import Cover from "./Cover";
+import Cover, { CoverHint } from "./Cover";
+import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
 import PhonePage from "./PhonePage";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
@@ -22,6 +23,21 @@ type BookProps = {
   content: Record<ChapterSlug, ChapterContent>;
 };
 
+// Live true/false for a media query (server guesses false)
+function media(query: string) {
+  return {
+    subscribe(onChange: () => void) {
+      const m = window.matchMedia(query);
+      m.addEventListener("change", onChange);
+      return () => m.removeEventListener("change", onChange);
+    },
+    get: () => window.matchMedia(query).matches,
+  };
+}
+const reducedMotion = media("(prefers-reduced-motion: reduce)");
+const laptopWidth = media("(min-width: 900px)");
+const serverFalse = () => false;
+
 // The one book that stays on screen. The URL is the boss: "/" means closed,
 // a chapter URL means open on that chapter, and the book changes to match.
 export default function Book({ content }: BookProps) {
@@ -32,6 +48,27 @@ export default function Book({ content }: BookProps) {
   const index = Math.max(0, CHAPTERS.findIndex((c) => c.href === pathname));
   const chapter = CHAPTERS[index];
   const nav = getChapterNav(chapter.slug);
+
+  // --- The cover ---
+  // No swing to wait for: reduced motion, or the laptop book isn't showing (phone)
+  const reduced = useSyncExternalStore(reducedMotion.subscribe, reducedMotion.get, serverFalse);
+  const laptop = useSyncExternalStore(laptopWidth.subscribe, laptopWidth.get, serverFalse);
+  const instant = reduced || !laptop;
+
+  // Which spread the pages are actually on (the flip library tells us after each turn)
+  const [flipAt, setFlipAt] = useState(closed ? 0 : index);
+  // Where the cover last finished swinging: true = open, false = shut
+  const [settledOpen, setSettledOpen] = useState(!closed);
+
+  // Closing from a later chapter: pages riffle back to the first chapter first,
+  // and the cover stays open until they get there.
+  const coverOpen = !closed || flipAt !== 0;
+  // Fully open and landed: the cover hides and the real pages take over
+  const coverDone = coverOpen && (instant || settledOpen);
+  // Fully shut and resting
+  const shutDone = !coverOpen && (instant || !settledOpen);
+  // Opening straight to a later chapter: the cover opens first, then the pages riffle.
+  const flipTarget = closed ? 0 : coverDone ? index : 0;
 
   // Where "next" and "previous" go from here.
   // Closed: next opens the book. First chapter: previous closes it.
@@ -44,7 +81,11 @@ export default function Book({ content }: BookProps) {
   const [startIndex] = useState(index);
   const [turned, setTurned] = useState(false);
   if (!turned && index !== startIndex) setTurned(true);
-  const showHint = !closed && index === 0 && !turned;
+  const showHint = coverDone && index === 0 && !turned;
+
+  // Under the book: "Click to open" once fully shut, the bottom bar once fully open,
+  // nothing while the cover is moving.
+  const footer = shutDone ? <CoverHint /> : coverDone ? <BookBottomBar nav={nav} /> : null;
 
   // Keyboard: Left and Right arrows turn the page (or open/close the book).
   // They only change the URL, and the book changes to match.
@@ -108,42 +149,57 @@ export default function Book({ content }: BookProps) {
     return () => window.removeEventListener("wheel", onWheel);
   }, [nextHref, prevHref, router]);
 
-  // Closed: just the cover (the swing open comes in the next step)
-  if (closed) return <Cover />;
-
   // Laptop: every chapter's two pages, in reading order
   const pages = CHAPTERS.flatMap((c) => [content[c.slug].left, content[c.slug].right]);
 
   return (
     <>
-      {/* 900px and up: two-page spread that turns */}
+      {closed && <h1 className="sr-only">Harbor, the working notebook of Abdullah Saghir</h1>}
+
+      {/* 900px and up: two-page spread that turns, with the swinging cover */}
       <div className="hidden flex-1 flex-col book:flex">
         <BookSpread
+          closed={!coverOpen}
+          clipLeft={!coverDone}
           header={
             <>
-              <BookTopNav current={chapter.slug} />
+              {/* Logo top-left only once the book is open */}
+              <BookTopNav current={coverDone ? chapter.slug : undefined} />
               {showHint && <TurnHint />}
             </>
           }
-          footer={<BookBottomBar nav={nav} />}
+          footer={footer}
+          cover={
+            <CoverLeaf
+              open={coverOpen}
+              done={coverDone}
+              inside={content[CHAPTERS[0].slug].left}
+              onSettle={setSettledOpen}
+            />
+          }
         >
           <FlipBook
             pages={pages}
-            spread={index}
+            spread={flipTarget}
             onUserTurn={(i) => router.push(CHAPTERS[i].href, { scroll: false })}
+            onArrive={setFlipAt}
           />
         </BookSpread>
       </div>
 
-      {/* Below 900px: one phone page (its own turn comes in Phase 2) */}
+      {/* Below 900px: the closed cover, or one phone page (its own turn comes in Phase 2) */}
       <div className="flex flex-1 flex-col book:hidden">
-        <PhonePage
-          slug={chapter.slug}
-          header={<PhoneHeader current={chapter.slug} />}
-          footer={<PhoneTurnBar nav={nav} />}
-        >
-          {content[chapter.slug].phone}
-        </PhonePage>
+        {closed ? (
+          <Cover />
+        ) : (
+          <PhonePage
+            slug={chapter.slug}
+            header={<PhoneHeader current={chapter.slug} />}
+            footer={<PhoneTurnBar nav={nav} />}
+          >
+            {content[chapter.slug].phone}
+          </PhonePage>
+        )}
       </div>
     </>
   );
