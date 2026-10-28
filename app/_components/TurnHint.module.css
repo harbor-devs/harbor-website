@@ -1,0 +1,22 @@
+/* Sits in the top bar, to the right of the logo, where there's free space */
+.hint {
+  position: absolute;
+  top: 12px;
+  left: 112px;
+  height: 48px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #e8dcc4;
+  pointer-events: none;
+}
+
+/* On narrower windows it would run into the menu, so hide it */
+@media (max-width: 1199px) {
+  .hint {
+    display: none;
+  }
+}
