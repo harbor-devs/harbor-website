@@ -39,8 +39,9 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 
 1. One shared book, every URL shows the right spread. No animation. DONE (Oct 27 2026)
 2. Page turn with the library + the waiting rule above. DONE (Oct 27 2026)
-3. All the ways to turn: arrows, top nav (riffle), keyboard, Back/Forward, scroll, drag.
-   Already working: bottom bar arrows, top nav riffle, drag, corner click.
-   Still to do: keyboard arrows, scroll to turn, test Back/Forward properly.
+3. All the ways to turn: arrows, top nav (riffle), keyboard, Back/Forward, scroll, drag. DONE (Oct 28 2026)
+   Working: bottom bar arrows, top nav riffle, drag, corner click, keyboard arrows, scroll to turn, Back/Forward.
+   At the first and last chapter the keys and scroll do nothing on purpose (cover and closing come in step 5).
+   Keyboard and scroll live in app/_components/Book.tsx. They only change the URL, the engine does the turning.
 4. Menu, page marker, "scroll or swipe" hint.
 5. Cover opening, closing, flower thank-you (design each together first).
