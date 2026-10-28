@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { CHAPTERS, getChapterNav, type ChapterSlug } from "../_lib/chapters";
 import { BookBottomBar, BookTopNav } from "./BookNav";
 import BookSpread from "./BookSpread";
@@ -53,6 +53,44 @@ export default function Book({ content }: BookProps) {
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     }, [nav.next, nav.prev, router]);
+
+      // Scroll: one scroll gesture turns one page. Scroll down = next, up = previous.
+  // A trackpad keeps sending events after your fingers stop, so we stay locked
+  // until the events go quiet.
+  const lockUntil = useRef(0);
+  const lastWheel = useRef(0);
+  const pushed = useRef(0);
+
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // pinch zoom, not a turn
+      if (!window.matchMedia("(min-width: 900px)").matches) return; // laptop book only
+
+      const now = performance.now();
+      const gap = now - lastWheel.current;
+      lastWheel.current = now;
+
+      // Locked: a turn just happened. Keep the lock until the events go quiet.
+      if (now < lockUntil.current) {
+        lockUntil.current = Math.max(lockUntil.current, now + 150);
+        return;
+      }
+
+      // New gesture: forget the old movement. Then add up this scroll.
+      if (gap > 200) pushed.current = 0;
+      pushed.current += e.deltaY;
+      if (Math.abs(pushed.current) < 40) return; // too small to count as a turn
+
+      const target = pushed.current > 0 ? nav.next : nav.prev;
+      pushed.current = 0;
+      lockUntil.current = now + 800;
+      if (!target) return; // first or last chapter
+      router.push(target.href, { scroll: false });
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [nav.next, nav.prev, router]);
 
     // Laptop: every chapter's two pages, in reading order
     const pages = CHAPTERS.flatMap((c) => [content[c.slug].left, content[c.slug].right]);
