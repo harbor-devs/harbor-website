@@ -11,8 +11,9 @@
 }
 
 /* ---------- What stays behind: page edges, ribbon, shadow ----------
-   The cover image is drawn 3.75% bigger than its 500 x 640 canvas
-   (518.75 / 500), so its 80px margin becomes 83px here. */
+   The cover image is drawn 3.75% bigger than its canvas (518.75 / 500).
+   Its margins: 80px left, top, right and 120px bottom, which become
+   83px and 124.5px here. The hole is exactly the cover board. */
 
 .base {
   position: absolute;
@@ -21,7 +22,7 @@
   width: calc(684.75 * var(--u));
   height: calc(871.5 * var(--u));
   box-sizing: border-box;
-  padding: calc(83 * var(--u));
+  padding: calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u));
   background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
   /* Cut a hole where the cover board is (that part swings with the cover) */
   mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
@@ -34,6 +35,52 @@
 .slot[data-open] .base {
   opacity: 0;
   transition: opacity 300ms ease;
+}
+
+/* ---------- The left half's shadow on the desk ----------
+   The open book's shadow is two halves: this one (left) and .shadowRight
+   in BookSpread. This half lives here because it arrives with the cover:
+   fades in as the cover comes down, fades out as it lifts.
+   It sits above the pages, so it's cut away only where it would darken
+   the right page (right of the spine, inside the book's height). */
+
+.ground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
+  box-shadow:
+    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
+    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+  clip-path: polygon(
+    calc(-200 * var(--u)) calc(-200 * var(--u)),
+    calc(530 * var(--u)) calc(-200 * var(--u)),
+    calc(530 * var(--u)) calc(664 * var(--u)),
+    calc(800 * var(--u)) calc(664 * var(--u)),
+    calc(800 * var(--u)) calc(900 * var(--u)),
+    calc(-200 * var(--u)) calc(900 * var(--u))
+  );
+  opacity: 0;
+}
+.slot[data-open] .ground {
+  opacity: 1;
+}
+.slot[data-moving][data-open] .ground {
+  animation: ground-landing var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-open]) .ground {
+  animation: ground-lifting var(--duration-cover) linear;
+}
+
+@keyframes ground-landing {
+  0%, 55% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes ground-lifting {
+  0% { opacity: 1; }
+  45%, 100% { opacity: 0; }
 }
 
 /* ---------- The cover ---------- */
@@ -89,34 +136,6 @@
   background: linear-gradient(180deg, #5e4428, #3e2a16);
 }
 
-/* Its shadow on the desk (same as the board's). Only there while the cover
-   is down on the desk: fades in as it lands, fades out as it lifts. */
-.back::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  box-shadow:
-    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
-    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
-}
-.slot[data-moving][data-open] .back::before {
-  animation: desk-shadow-landing var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .back::before {
-  animation: desk-shadow-lifting var(--duration-cover) linear;
-}
-
-@keyframes desk-shadow-landing {
-  0%, 70% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@keyframes desk-shadow-lifting {
-  0% { opacity: 1; }
-  30%, 100% { opacity: 0; }
-}
-
 /* At rest: closed shows the outside, open shows the inside */
 .slot[data-open] .front {
   opacity: 0;
@@ -155,6 +174,30 @@
 @keyframes back-closing {
   0%, 50% { opacity: 1; }
   50.01%, 100% { opacity: 0; }
+}
+
+/* Page stack edges under the left page. Exact copy of .stackLeft in
+   BookSpread.module.css, so the landed cover matches the open book. */
+.stack {
+  position: absolute;
+  top: calc(12 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(644 * var(--u));
+  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
+  background: repeating-linear-gradient(
+    to top,
+    #e8dabd 0,
+    #e8dabd calc(1.2 * var(--u)),
+    #bba57d calc(1.2 * var(--u)),
+    #bba57d calc(2 * var(--u))
+  );
+  box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
+    calc(-1 * var(--u)) var(--u) 0 #e6d8bc,
+    calc(-2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(-3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(-4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
 }
 
 /* The left page, in exactly the real left page's spot */
@@ -247,7 +290,7 @@
   }
   .slot[data-moving] .front,
   .slot[data-moving] .back,
-  .slot[data-moving] .back::before,
+  .slot[data-moving] .ground,
   .slot[data-moving] .shade,
   .slot[data-moving] .cast {
     animation: none;

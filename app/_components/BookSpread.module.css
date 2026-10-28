@@ -40,11 +40,24 @@
   transform: scale(0.85) translateX(-25%);
 }
 
+/* The leather board. No shadow of its own: the shadow is two halves
+   (.shadowRight here, .ground in CoverLeaf), so nothing ever has to be
+   cut at the spine. Cutting a shadow left a hard line under the book. */
 .board {
   position: absolute;
   inset: 0;
   border-radius: calc(6 * var(--u));
   background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* Shadow under the right half of the book */
+.shadowRight {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
   box-shadow:
     0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
     0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
@@ -91,29 +104,31 @@
 }
 
 /* ---------- Opening and closing ----------
-   Right half (board edge, right stack): fades in as the cover starts lifting,
-   fades out as the cover lands back on it.
+   Right half (board edge, its shadow, right stack): fades in as the cover
+   starts lifting, fades out as the cover lands back on it.
    Left half (board, left stack): only appears under the landed cover, and
    hides the moment it starts closing, so the switch is never seen. */
 
 .board {
-  clip-path: inset(calc(-120 * var(--u)));
+  clip-path: inset(0);
   transition:
     opacity 300ms ease,
     clip-path 0s linear var(--duration-cover);
 }
 .stage[data-closed] .board {
   opacity: 0;
-  /* Left half cut off, shadow still allowed outside on the other sides */
-  clip-path: inset(calc(-120 * var(--u)) calc(-120 * var(--u)) calc(-120 * var(--u)) 50%);
+  /* Left half cut off (the board has no shadow, so this leaves no line) */
+  clip-path: inset(0 0 0 50%);
   transition:
     opacity 300ms ease 800ms,
     clip-path 0s;
 }
 
+.shadowRight,
 .stackRight {
   transition: opacity 300ms ease;
 }
+.stage[data-closed] .shadowRight,
 .stage[data-closed] .stackRight {
   opacity: 0;
   transition: opacity 300ms ease 800ms;
@@ -171,9 +186,11 @@
 @media (prefers-reduced-motion: reduce) {
   .book,
   .board,
+  .shadowRight,
   .stackLeft,
   .stackRight,
   .stage[data-closed] .board,
+  .stage[data-closed] .shadowRight,
   .stage[data-closed] .stackLeft,
   .stage[data-closed] .stackRight {
     transition: none;

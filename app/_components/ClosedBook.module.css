@@ -18,6 +18,12 @@
   transform: translateY(-4px);
 }
 
+/* Bare (the laptop swinging cover): no lift. Its shadow stays on the desk,
+   so lifting the board alone would open a gap under it. */
+.book[data-bare]:hover {
+  transform: none;
+}
+
 .book:focus-visible {
   outline-offset: 8px;
 }
@@ -31,7 +37,8 @@
   }
 }
 
-/* Baked image is bigger than the book (80px extra each side for shadows + ribbon) */
+/* Baked image is bigger than the book: 80px extra left, top and right,
+   120px extra at the bottom (shadow + ribbon hang lower) */
 .texture {
   position: absolute;
   left: calc(-80 * var(--u));
@@ -42,9 +49,10 @@
   pointer-events: none;
 }
 
-/* Bare: cut the image down to the cover board (drops page edges, ribbon, shadow) */
+/* Bare: cut the image down to exactly the cover board
+   (drops page edges, ribbon and shadow, which stay on the desk) */
 .book[data-bare] .texture {
-  clip-path: inset(calc(80 * var(--u)));
+  clip-path: inset(calc(80 * var(--u)) calc(80 * var(--u)) calc(120 * var(--u)) calc(80 * var(--u)));
 }
 
 /* Leather spine with the sideways title */
