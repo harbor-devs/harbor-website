@@ -10,12 +10,17 @@ import {
 import { ArrowLeft, ArrowRight, Diamond } from "./icons";
 import styles from "./BookNav.module.css";
 
+type BookTopNavProps = {
+  current?: ChapterSlug; // the open chapter (empty on the covers)
+  logo?: boolean; // show the logo (to the front cover); defaults to "a chapter is open"
+};
+
 // Laptop top nav: logo (to the cover) + the six chapters.
-// On the cover there's no current chapter, and no logo (you're already home).
-export function BookTopNav({ current }: { current?: ChapterSlug }) {
+// On the front cover there's no logo (you're already home).
+export function BookTopNav({ current, logo = current !== undefined }: BookTopNavProps) {
   return (
     <nav aria-label="Main" className={styles.topNav}>
-      {current && (
+      {logo && (
         <Link href={COVER_HREF} className={styles.logo}>
           <Image src="/logo-mark.svg" alt="Harbor, back to the cover" width={44} height={48} unoptimized />
         </Link>
@@ -38,7 +43,7 @@ export function BookTopNav({ current }: { current?: ChapterSlug }) {
 }
 
 // Laptop bottom bar: previous / current chapter (with "2 of 6" under it) / next.
-// At the ends, "Close the book" takes you to the cover (front or back).
+// At the ends, "Close the book" closes the front or the back cover.
 export function BookBottomBar({ nav }: { nav: ChapterNav }) {
   const { chapter, prev, next, number, total } = nav;
 
@@ -63,6 +68,30 @@ export function BookBottomBar({ nav }: { nav: ChapterNav }) {
 
       <Link href={next ? next.href : BACK_COVER_HREF} className={styles.barLink}>
         {next ? next.title : "Close the book"}
+        <ArrowRight />
+      </Link>
+    </nav>
+  );
+}
+
+// Under the closed back cover: back to the last chapter, or start over.
+// Same quiet italic style as "Click to open" under the front cover.
+export function BackCoverBar() {
+  const last = CHAPTERS[CHAPTERS.length - 1];
+
+  return (
+    <nav aria-label="The end" className={styles.endBar}>
+      <Link href={last.href} className={styles.endLink}>
+        <ArrowLeft />
+        {last.title}
+      </Link>
+
+      <span aria-hidden="true" className={styles.endDot}>
+        <Diamond />
+      </span>
+
+      <Link href={COVER_HREF} className={styles.endLink}>
+        Read again
         <ArrowRight />
       </Link>
     </nav>

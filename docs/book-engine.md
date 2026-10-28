@@ -8,6 +8,7 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 - Each chapter has its own URL (/introduction, /portfolio, ...). Direct links and refresh open the right page.
 - The URL is the boss. Every way of turning (arrows, top nav, keyboard, Back/Forward, dragging the page) just changes the URL, and the book turns to match.
 - "/" is the closed book (the cover). It lives inside the same shared book, in app/(book)/page.tsx.
+- "/the-end" is the book closed from the back (app/(book)/the-end/page.tsx).
 
 ## Page turn library
 
@@ -48,6 +49,18 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 - The bottom bar, "Click to open" and the top-left logo wait until the book finishes, then fade in.
 - Cover.tsx is phone only now, plus it exports CoverHint ("Click to open" on laptop).
 
+## The back cover (mirror of the front)
+
+- app/_components/BackLeaf.tsx + BackLeaf.module.css. Same tricks as CoverLeaf, from the right side.
+- At Contact, → / scroll down / "Close the book" go to "/the-end". The last page swings over to the left and becomes the back cover. The book slides the other way (scale 0.85, translateX 25%).
+- The back cover outside is the front cover's baked image, mirrored by the swing (spine on the right), no text, small faded logo low down (pre-flipped so it reads right).
+- Open, BackLeaf is a copy of the right half (board, right page stack, Contact right page). It only shows while swinging or shut; otherwise the real right page shows.
+- Order of moves: going to "/the-end" from any chapter riffles to Contact first, then the back shuts. Leaving "/the-end" opens the back first, then riffles (and closes the front if going to "/").
+- The back only shuts once the front is fully open and the pages are on the last chapter.
+- Shadows: BackLeaf has its own right-half .ground (identical to .shadowRight, swaps at rest). When the back lands on the left, CoverLeaf's left .ground fades out (hideGround) while the mirrored baked base fades in.
+- Under the closed back: BackCoverBar in BookNav.tsx (← Contact ◆ The end · Read again →). Half the book wide, nudged left by 8 canvas px to sit under the logo, pushed down to clear the ribbon.
+- Phone shows the front cover on "/the-end" until Phase 2.
+
 ## Shadow rules (learned the hard way, Oct 28 2026)
 
 - Never put a desk shadow ON something that swings. It swings through the air with it and looks like a dark slab.
@@ -69,10 +82,11 @@ How the Harbor diary turns pages. Read this before changing anything in the book
    5a. Cover moved inside the shared book. DONE (Oct 28 2026)
        On the cover: → or scroll down opens. On Introduction: ← or scroll up closes.
    5b. Cover swings open and shut like a real book. DONE (Oct 28 2026), shadows fixed same day.
-   5c. Back cover: at Contact, → and "Close the book" close the back cover (not riffle to the front). TODO
-   5d. Flower thank-you after the back cover closes. TODO
+   5c. Back cover: at Contact, → and "Close the book" close the back cover. DONE (Oct 28 2026)
+   5d. Flower thank-you after the back cover closes. TODO (agreed idea: a pressed jasmine slides out of the pages onto the desk, then "Thank you for reading")
 
 ## Open items
 
 - Light blurry blob above the top-right corner of the closed cover. It is baked into cover.webp, re-bake in polish.
 - The turn hint hides after the first turn on purpose. May revisit.
+- The small logo on the back cover reads a bit blurry at that size. Tune in polish.

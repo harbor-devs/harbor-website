@@ -2,8 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { CHAPTERS, COVER_HREF, getChapterNav, type ChapterSlug } from "../_lib/chapters";
-import { BookBottomBar, BookTopNav } from "./BookNav";
+import { BACK_COVER_HREF, CHAPTERS, COVER_HREF, getChapterNav, type ChapterSlug } from "../_lib/chapters";
+import BackLeaf from "./BackLeaf";
+import { BackCoverBar, BookBottomBar, BookTopNav } from "./BookNav";
 import BookSpread from "./BookSpread";
 import Cover, { CoverHint } from "./Cover";
 import CoverLeaf from "./CoverLeaf";
@@ -38,18 +39,22 @@ const reducedMotion = media("(prefers-reduced-motion: reduce)");
 const laptopWidth = media("(min-width: 900px)");
 const serverFalse = () => false;
 
-// The one book that stays on screen. The URL is the boss: "/" means closed,
-// a chapter URL means open on that chapter, and the book changes to match.
+// The last chapter's spread (where the back cover closes)
+const LAST = CHAPTERS.length - 1;
+
+// The one book that stays on screen. The URL is the boss: "/" means the front
+// cover is shut, "/the-end" means the back cover is shut, a chapter URL means
+// open on that chapter, and the book changes to match.
 export default function Book({ content }: BookProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   const closed = pathname === COVER_HREF;
-  const index = Math.max(0, CHAPTERS.findIndex((c) => c.href === pathname));
+  const backClosed = pathname === BACK_COVER_HREF;
+  const index = backClosed ? LAST : Math.max(0, CHAPTERS.findIndex((c) => c.href === pathname));
   const chapter = CHAPTERS[index];
   const nav = getChapterNav(chapter.slug);
 
-  // --- The cover ---
   // No swing to wait for: reduced motion, or the laptop book isn't showing (phone)
   const reduced = useSyncExternalStore(reducedMotion.subscribe, reducedMotion.get, serverFalse);
   const laptop = useSyncExternalStore(laptopWidth.subscribe, laptopWidth.get, serverFalse);
@@ -57,9 +62,12 @@ export default function Book({ content }: BookProps) {
 
   // Which spread the pages are actually on (the flip library tells us after each turn)
   const [flipAt, setFlipAt] = useState(closed ? 0 : index);
-  // Where the cover last finished swinging: true = open, false = shut
+  // Where the front cover last finished swinging: true = open, false = shut
   const [settledOpen, setSettledOpen] = useState(!closed);
+  // Where the back cover last finished swinging: true = shut, false = open
+  const [backSettledShut, setBackSettledShut] = useState(backClosed);
 
+  // --- The front cover ---
   // Closing from a later chapter: pages riffle back to the first chapter first,
   // and the cover stays open until they get there.
   const coverOpen = !closed || flipAt !== 0;
@@ -67,25 +75,44 @@ export default function Book({ content }: BookProps) {
   const coverDone = coverOpen && (instant || settledOpen);
   // Fully shut and resting
   const shutDone = !coverOpen && (instant || !settledOpen);
-  // Opening straight to a later chapter: the cover opens first, then the pages riffle.
-  const flipTarget = closed ? 0 : coverDone ? index : 0;
+
+  // --- The back cover ---
+  // Only shuts once the front is open and the pages are on the last chapter
+  const backShut = backClosed && coverDone && flipAt === LAST;
+  // Open and resting: the real last page shows
+  const backDone = !backShut && (instant || !backSettledShut);
+  // Shut and resting
+  const backShutDone = backShut && (instant || backSettledShut);
+
+  // Where the pages go. They wait for the back cover to be fully open,
+  // and for the front cover to be fully open before leaving the first chapter.
+  const flipTarget = !backDone ? LAST : closed ? 0 : coverDone ? index : 0;
 
   // Where "next" and "previous" go from here.
-  // Closed: next opens the book. First chapter: previous closes it.
-  // Last chapter: next does nothing until the back cover is built.
-  const nextHref = closed ? CHAPTERS[0].href : (nav.next?.href ?? null);
-  const prevHref = closed ? null : (nav.prev?.href ?? COVER_HREF);
+  // Front shut: next opens. First chapter: previous closes the front.
+  // Last chapter: next closes the back. Back shut: previous opens it again.
+  const nextHref = closed ? CHAPTERS[0].href : backClosed ? null : (nav.next?.href ?? BACK_COVER_HREF);
+  const prevHref = closed ? null : backClosed ? CHAPTERS[LAST].href : (nav.prev?.href ?? COVER_HREF);
+
+  // The book is fully open on a chapter (neither cover in the way or moving)
+  const open = coverDone && backDone;
 
   // The "scroll or use the arrow keys" hint: shown on the first chapter
   // until the visitor turns a page for the first time, then gone for good.
   const [startIndex] = useState(index);
   const [turned, setTurned] = useState(false);
   if (!turned && index !== startIndex) setTurned(true);
-  const showHint = coverDone && index === 0 && !turned;
+  const showHint = open && index === 0 && !turned;
 
-  // Under the book: "Click to open" once fully shut, the bottom bar once fully open,
-  // nothing while the cover is moving.
-  const footer = shutDone ? <CoverHint /> : coverDone ? <BookBottomBar nav={nav} /> : null;
+  // Under the book, once it stops moving: "Click to open" (front shut),
+  // the bottom bar (open), or "Contact / The end / Read again" (back shut).
+  const footer = shutDone ? (
+    <CoverHint />
+  ) : open ? (
+    <BookBottomBar nav={nav} />
+  ) : backShutDone ? (
+    <BackCoverBar />
+  ) : null;
 
   // Keyboard: Left and Right arrows turn the page (or open/close the book).
   // They only change the URL, and the book changes to match.
@@ -155,16 +182,19 @@ export default function Book({ content }: BookProps) {
   return (
     <>
       {closed && <h1 className="sr-only">Harbor, the working notebook of Abdullah Saghir</h1>}
+      {backClosed && <h1 className="sr-only">The end. Thank you for reading Harbor.</h1>}
 
-      {/* 900px and up: two-page spread that turns, with the swinging cover */}
+      {/* 900px and up: two-page spread that turns, with both swinging covers */}
       <div className="hidden flex-1 flex-col book:flex">
         <BookSpread
           closed={!coverOpen}
+          backClosed={backShut}
           clipLeft={!coverDone}
+          clipRight={!backDone}
           header={
             <>
-              {/* Logo top-left only once the book is open */}
-              <BookTopNav current={coverDone ? chapter.slug : undefined} />
+              {/* Logo top-left once the book is open, or resting on its back cover */}
+              <BookTopNav current={open ? chapter.slug : undefined} logo={open || backShutDone} />
               {showHint && <TurnHint />}
             </>
           }
@@ -173,8 +203,17 @@ export default function Book({ content }: BookProps) {
             <CoverLeaf
               open={coverOpen}
               done={coverDone}
+              hideGround={backShut}
               inside={content[CHAPTERS[0].slug].left}
               onSettle={setSettledOpen}
+            />
+          }
+          back={
+            <BackLeaf
+              shut={backShut}
+              done={backDone}
+              inside={content[CHAPTERS[LAST].slug].right}
+              onSettle={setBackSettledShut}
             />
           }
         >
@@ -187,9 +226,10 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-      {/* Below 900px: the closed cover, or one phone page (its own turn comes in Phase 2) */}
+      {/* Below 900px: the closed cover, or one phone page (its own turn comes in Phase 2).
+          The back cover shows the front cover on phone until then. */}
       <div className="flex flex-1 flex-col book:hidden">
-        {closed ? (
+        {closed || backClosed ? (
           <Cover />
         ) : (
           <PhonePage

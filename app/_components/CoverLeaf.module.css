@@ -66,6 +66,13 @@
 }
 .slot[data-open] .ground {
   opacity: 1;
+  /* Back cover reopening: comes back as the back cover's baked shadow fades */
+  transition: opacity 300ms ease;
+}
+/* Back cover shut on the left half: its baked shadow takes over as it lands */
+.slot[data-hide-ground] .ground {
+  opacity: 0;
+  transition: opacity 300ms ease 800ms;
 }
 .slot[data-moving][data-open] .ground {
   animation: ground-landing var(--duration-cover) linear;
@@ -284,6 +291,8 @@
 @media (prefers-reduced-motion: reduce) {
   .base,
   .slot[data-open] .base,
+  .slot[data-open] .ground,
+  .slot[data-hide-ground] .ground,
   .leaf,
   .slot[data-done] .leaf {
     transition: none;

@@ -28,12 +28,11 @@ export const CHAPTERS: readonly Chapter[] = [
   { slug: "contact", href: "/contact", title: "Contact", navLabel: "Contact", shortLabel: "Contact", numeral: "vi" },
 ];
 
-// Before the first chapter: the closed cover.
+// Before the first chapter: the closed front cover.
 export const COVER_HREF = "/";
 
-// After the last chapter: back cover + flower easter egg.
-// Points to the cover until that animation is built.
-export const BACK_COVER_HREF = "/";
+// After the last chapter: the closed back cover (the flower thank-you comes here too).
+export const BACK_COVER_HREF = "/the-end";
 
 // Everything a page needs to draw its navigation.
 export function getChapterNav(slug: ChapterSlug) {

@@ -8,6 +8,7 @@ import styles from "./CoverLeaf.module.css";
 type CoverLeafProps = {
   open: boolean; // swung open (or swinging open)
   done: boolean; // fully open and landed: hide it, the real left page takes over
+  hideGround?: boolean; // the back cover is shut on the left half and brings its own shadow
   inside: ReactNode; // what's printed on the inside: the first chapter's left page
   onSettle: (open: boolean) => void; // the swing finished
 };
@@ -19,7 +20,7 @@ type CoverLeafProps = {
 // outside to the inside. The inside is a copy of the open book's left half
 // (board, page stack edges, first left page), so when it lands, the swap to
 // the real book can't be seen.
-export default function CoverLeaf({ open, done, inside, onSettle }: CoverLeafProps) {
+export default function CoverLeaf({ open, done, hideGround = false, inside, onSettle }: CoverLeafProps) {
   // Where the swing last came to rest, so we know when it's moving
   const [rest, setRest] = useState(open);
   const moving = open !== rest;
@@ -30,6 +31,7 @@ export default function CoverLeaf({ open, done, inside, onSettle }: CoverLeafPro
       data-open={open || undefined}
       data-done={done || undefined}
       data-moving={moving || undefined}
+      data-hide-ground={hideGround || undefined}
     >
       {/* What stays with the pages when the cover lifts: page edges, ribbon, shadow.
           Same baked image as the cover, with the cover board cut out. */}

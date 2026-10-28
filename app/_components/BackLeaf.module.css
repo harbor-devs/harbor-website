@@ -1,0 +1,316 @@
+/* The swinging back cover. Numbers are canvas pixels of the open book (1060 x 664).
+   Open, it lies on the right half with its left edge on the spine.
+   Shut, it lies on the left half, the front cover's mirror image. */
+
+.slot {
+  position: absolute;
+  inset: 0;
+  /* Depth for the swing */
+  perspective: calc(2600 * var(--u));
+  pointer-events: none;
+}
+
+/* ---------- Shut: page edges, ribbon, shadow around the back cover ----------
+   Same baked image and hole as CoverLeaf's .base, flipped and moved to the
+   left half. The hole is exactly the board (x 11.25 to 530). */
+
+.base {
+  position: absolute;
+  left: calc(-71.75 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  box-sizing: border-box;
+  padding: calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+  transform: scaleX(-1);
+  opacity: 0;
+  /* Opening: hands over to the open book as the cover lifts */
+  transition: opacity 300ms ease;
+}
+/* Shutting: comes in as the cover lands */
+.slot[data-shut] .base {
+  opacity: 1;
+  transition: opacity 300ms ease 800ms;
+}
+
+/* ---------- The right half's shadow on the desk ----------
+   Shows only while this cover is open but not yet handed over
+   (BookSpread's .shadowRight takes over after, and they're identical).
+   Cut away only where it would darken the left page. */
+
+.ground {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
+  box-shadow:
+    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
+    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+  clip-path: polygon(
+    calc(730 * var(--u)) calc(-200 * var(--u)),
+    0 calc(-200 * var(--u)),
+    0 calc(664 * var(--u)),
+    calc(-270 * var(--u)) calc(664 * var(--u)),
+    calc(-270 * var(--u)) calc(900 * var(--u)),
+    calc(730 * var(--u)) calc(900 * var(--u))
+  );
+  opacity: 0;
+}
+.slot:not([data-shut]):not([data-done]) .ground {
+  opacity: 1;
+}
+.slot[data-moving]:not([data-shut]) .ground {
+  animation: ground-landing var(--duration-cover) linear;
+}
+.slot[data-moving][data-shut] .ground {
+  animation: ground-lifting var(--duration-cover) linear;
+}
+
+@keyframes ground-landing {
+  0%, 55% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes ground-lifting {
+  0% { opacity: 1; }
+  45%, 100% { opacity: 0; }
+}
+
+/* ---------- The cover ---------- */
+
+.leaf {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  transform-origin: left center;
+  pointer-events: none;
+  transition:
+    transform var(--duration-cover) var(--ease-turn),
+    opacity 0s,
+    visibility 0s;
+}
+
+/* Swung over to the left */
+.slot[data-shut] .leaf {
+  transform: rotateY(-180deg);
+}
+
+/* Open and resting: hand over to the real right page (looks identical) */
+.slot[data-done] .leaf {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform var(--duration-cover) var(--ease-turn),
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+/* Inside (seen while open): a copy of the open book's right half */
+.inside {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
+}
+
+.board {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* Exact copy of .stackRight in BookSpread.module.css */
+.stack {
+  position: absolute;
+  top: calc(12 * var(--u));
+  left: 0;
+  width: calc(520 * var(--u));
+  height: calc(644 * var(--u));
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  background: repeating-linear-gradient(
+    to top,
+    #e8dabd 0,
+    #e8dabd calc(1.2 * var(--u)),
+    #bba57d calc(1.2 * var(--u)),
+    #bba57d calc(2 * var(--u))
+  );
+  box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
+    var(--u) var(--u) 0 #e6d8bc,
+    calc(2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
+}
+
+/* The right page, in exactly the real right page's spot */
+.page {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: 0;
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+}
+
+/* Outside (seen once shut): the front cover board, mirrored by the swing.
+   Same size as the closed front cover (500 x 640 drawn at 518.75 x 664). */
+.outside {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(518.75 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
+  opacity: 0;
+}
+
+/* The baked cover image cut down to just the board (like ClosedBook bare) */
+.texture {
+  position: absolute;
+  left: calc(-83 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  clip-path: inset(calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u)));
+}
+
+/* Small faded logo, low on the back. Pre-flipped so it reads the right way. */
+.mark {
+  position: absolute;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  bottom: calc(84 * var(--u));
+  display: flex;
+  justify-content: center;
+  transform: scaleX(-1);
+}
+
+.logo {
+  width: calc(64 * var(--u));
+  height: auto;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* At rest: open shows the inside, shut shows the outside */
+.slot[data-shut] .inside {
+  opacity: 0;
+}
+.slot[data-shut] .outside {
+  opacity: 1;
+}
+
+/* While swinging: swap exactly at the halfway point (edge-on) */
+.slot[data-moving][data-shut] .inside {
+  animation: inside-shutting var(--duration-cover) linear;
+}
+.slot[data-moving][data-shut] .outside {
+  animation: outside-shutting var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-shut]) .inside {
+  animation: inside-opening var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-shut]) .outside {
+  animation: outside-opening var(--duration-cover) linear;
+}
+
+@keyframes inside-shutting {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+@keyframes outside-shutting {
+  0%, 50% { opacity: 0; }
+  50.01%, 100% { opacity: 1; }
+}
+@keyframes inside-opening {
+  0%, 50% { opacity: 0; }
+  50.01%, 100% { opacity: 1; }
+}
+@keyframes outside-opening {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* ---------- Light and shadow (only while swinging) ---------- */
+
+/* The free edge (far from the spine) darkens first, strongest when edge-on */
+.shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(26, 16, 9, 0.08), rgba(26, 16, 9, 0.55));
+}
+.slot[data-moving][data-shut] .shade {
+  animation: shade-shutting var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-shut]) .shade {
+  animation: shade-opening var(--duration-cover) linear;
+}
+
+/* Soft shadow on the left page, near the spine, while the cover is just above it */
+.cast {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+  background: linear-gradient(
+    to left,
+    rgba(30, 18, 8, 0.45) 0%,
+    rgba(30, 18, 8, 0.18) 18%,
+    rgba(30, 18, 8, 0) 50%
+  );
+  opacity: 0;
+}
+.slot[data-moving][data-shut] .cast {
+  animation: cast-landing var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-shut]) .cast {
+  animation: cast-lifting var(--duration-cover) linear;
+}
+
+/* Two names with the same steps, so the animation restarts when the direction changes */
+@keyframes shade-shutting {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes shade-opening {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes cast-landing {
+  0%, 60% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes cast-lifting {
+  0% { opacity: 1; }
+  40%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .base,
+  .slot[data-shut] .base,
+  .leaf,
+  .slot[data-done] .leaf {
+    transition: none;
+  }
+  .slot[data-moving] .inside,
+  .slot[data-moving] .outside,
+  .slot[data-moving] .ground,
+  .slot[data-moving] .shade,
+  .slot[data-moving] .cast {
+    animation: none;
+  }
+}
