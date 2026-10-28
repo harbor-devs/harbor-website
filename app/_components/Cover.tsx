@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { BookTopNav } from "./_components/BookNav";
-import ClosedBook from "./_components/ClosedBook";
-import { ArrowRight } from "./_components/icons";
-import { PhoneHeader } from "./_components/PhoneNav";
-import { CHAPTERS } from "./_lib/chapters";
-import styles from "./page.module.css";
+import { BookTopNav } from "./BookNav";
+import ClosedBook from "./ClosedBook";
+import { ArrowRight } from "./icons";
+import { PhoneHeader } from "./PhoneNav";
+import { CHAPTERS } from "../_lib/chapters";
+import styles from "./Cover.module.css";
 
-// The cover: the closed diary. Clicking it (or the hint under it) opens chapter one.
-export default function CoverPage() {
+// The closed diary. Shown by the book when the URL is "/".
+// Clicking it (or the hint under it) opens chapter one.
+export default function Cover() {
   return (
     <div className={styles.stage}>
       <header className={styles.header}>
