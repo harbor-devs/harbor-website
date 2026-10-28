@@ -37,10 +37,10 @@ export function BookTopNav({ current }: { current?: ChapterSlug }) {
   );
 }
 
-// Laptop bottom bar: previous / current chapter / next.
+// Laptop bottom bar: previous / current chapter (with "2 of 6" under it) / next.
 // At the ends, "Close the book" takes you to the cover (front or back).
 export function BookBottomBar({ nav }: { nav: ChapterNav }) {
-  const { chapter, prev, next } = nav;
+  const { chapter, prev, next, number, total } = nav;
 
   return (
     <nav aria-label="Chapter" className={styles.bar}>
@@ -49,11 +49,17 @@ export function BookBottomBar({ nav }: { nav: ChapterNav }) {
         {prev ? prev.title : "Close the book"}
       </Link>
 
-      <p className={styles.current}>
-        <Diamond />
-        <span className="sr-only">Current chapter: </span>
-        {chapter.title}
-      </p>
+      <div className={styles.current}>
+        <p className={styles.currentName}>
+          <Diamond />
+          <span className="sr-only">Current chapter: </span>
+          {chapter.title}
+        </p>
+        <p className={styles.count}>
+          <span className="sr-only">Chapter </span>
+          {number} of {total}
+        </p>
+      </div>
 
       <Link href={next ? next.href : BACK_COVER_HREF} className={styles.barLink}>
         {next ? next.title : "Close the book"}

@@ -53,17 +53,26 @@
   text-underline-offset: 5px;
 }
 
-/* Bottom bar, as wide as the book */
+/* Bottom bar, as wide as the book.
+   Three columns: the middle one is always dead center, whatever the side links say. */
 .bar {
   height: 100%;
   box-sizing: border-box;
   padding-top: 12px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   font-size: 15px;
   line-height: 24px;
   color: var(--color-paper-deep);
+}
+
+.bar > :first-child {
+  justify-self: start;
+}
+
+.bar > :last-child {
+  justify-self: end;
 }
 
 .barLink {
@@ -80,7 +89,14 @@
   text-underline-offset: 4px;
 }
 
+/* Chapter name with "2 of 6" under it */
 .current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.currentName {
   margin: 0;
   display: flex;
   align-items: center;
@@ -90,4 +106,12 @@
 /* Only the diamond is brass, the text stays light */
 .current svg {
   color: var(--color-brass);
+}
+
+.count {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
 }
