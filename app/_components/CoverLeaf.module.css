@@ -76,7 +76,7 @@
 }
 
 /* Inside of the cover. Pre-flipped, so it reads the right way round once
-   the cover lies open. Same size and shadow as the board's left half. */
+   the cover lies open. Same size as the board's left half. */
 .back {
   position: absolute;
   top: 0;
@@ -87,9 +87,34 @@
   opacity: 0;
   border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
   background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* Its shadow on the desk (same as the board's). Only there while the cover
+   is down on the desk: fades in as it lands, fades out as it lifts. */
+.back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   box-shadow:
     0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
     0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+}
+.slot[data-moving][data-open] .back::before {
+  animation: desk-shadow-landing var(--duration-cover) linear;
+}
+.slot[data-moving]:not([data-open]) .back::before {
+  animation: desk-shadow-lifting var(--duration-cover) linear;
+}
+
+@keyframes desk-shadow-landing {
+  0%, 70% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes desk-shadow-lifting {
+  0% { opacity: 1; }
+  30%, 100% { opacity: 0; }
 }
 
 /* At rest: closed shows the outside, open shows the inside */
@@ -222,6 +247,7 @@
   }
   .slot[data-moving] .front,
   .slot[data-moving] .back,
+  .slot[data-moving] .back::before,
   .slot[data-moving] .shade,
   .slot[data-moving] .cast {
     animation: none;
