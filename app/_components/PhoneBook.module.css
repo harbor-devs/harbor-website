@@ -1,0 +1,156 @@
+/* Phone: the diary as one A5 page that turns. Numbers are canvas px (330 x 467 page). */
+
+.stage {
+  /* Space for the phone header and bottom nav */
+  --chrome-top: 112px;
+  --chrome-bottom: 104px;
+  /* Cap for big phones and portrait tablets */
+  --page-max: 520px;
+
+  flex: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: var(--chrome-top) 0 var(--chrome-bottom);
+  /* The curl pokes past the left screen edge, don't let it cause sideways scroll */
+  overflow: clip;
+}
+
+.page {
+  position: relative;
+  /* Page + curl (38px left) + edge (5px right) = 373 canvas px wide.
+     Fit that whole group with a 16px gutter each side. */
+  width: min(
+    var(--page-max),
+    calc((100% - 32px) * 330 / 373),
+    calc((100dvh - var(--chrome-top) - var(--chrome-bottom)) * 330 / 467)
+  );
+  aspect-ratio: 330 / 467;
+  /* Shift right by half of (curl - edge), so page + curl look centered together */
+  translate: 5% 0;
+  container-type: inline-size;
+  /* 1 canvas pixel */
+  --u: calc(100cqw / 330);
+}
+
+/* Page stack edges, right and bottom */
+.edgeRight {
+  position: absolute;
+  right: calc(-5 * var(--u));
+  top: calc(3 * var(--u));
+  bottom: calc(-3 * var(--u));
+  width: calc(6 * var(--u));
+  border-radius: 0 calc(2 * var(--u)) calc(2 * var(--u)) 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #e2d2b2 0,
+    #e2d2b2 var(--u),
+    #bfa982 var(--u),
+    #bfa982 calc(2 * var(--u))
+  );
+}
+
+.edgeBottom {
+  position: absolute;
+  left: calc(4 * var(--u));
+  right: calc(-3 * var(--u));
+  bottom: calc(-5 * var(--u));
+  height: calc(6 * var(--u));
+  border-radius: 0 0 calc(2 * var(--u)) calc(2 * var(--u));
+  background: repeating-linear-gradient(
+    180deg,
+    #e2d2b2 0,
+    #e2d2b2 var(--u),
+    #bfa982 var(--u),
+    #bfa982 calc(2 * var(--u))
+  );
+}
+
+/* The page's shadow on the stack. Its own layer, so it never moves with a turn. */
+.shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  box-shadow: 0 var(--u) calc(2 * var(--u)) rgba(40, 22, 8, 0.35);
+}
+
+/* Holds every chapter's page. Fingers on here turn the page. */
+.box {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+/* One chapter's page. Only one shows at a time (data-on). */
+.sheet {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  visibility: hidden;
+}
+
+.sheet[data-on] {
+  visibility: visible;
+}
+
+/* Pages folded back around the left edge (image includes its shadow) */
+.curl {
+  position: absolute;
+  left: calc(-70 * var(--u));
+  top: calc(-26 * var(--u));
+  width: calc(96 * var(--u));
+  height: calc(539 * var(--u));
+  background: url("/textures/curl-phone.webp") 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The WebGL turn draws in here, on top of everything, only while turning */
+.glHost {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.gl {
+  position: absolute;
+  visibility: hidden;
+}
+
+.gl[data-on] {
+  visibility: visible;
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  padding: calc(30 * var(--u)) calc(26 * var(--u)) calc(22 * var(--u)) calc(36 * var(--u));
+  display: flex;
+  flex-direction: column;
+  color: var(--color-umber);
+  font-weight: 500;
+  font-size: calc(17 * var(--u));
+  line-height: calc(25 * var(--u));
+}
+
+/* Nav slots, sitting in the space .stage keeps free */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--chrome-top);
+}
+
+.footer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--chrome-bottom);
+}
