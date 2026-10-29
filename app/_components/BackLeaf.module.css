@@ -199,6 +199,77 @@
   mix-blend-mode: multiply;
 }
 
+/* ---------- The thank-you (step 5d) ----------
+   Same box and pre-flip as .mark, so the note and flower sit on the
+   same center line as the logo. */
+
+.gift {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  transform: scaleX(-1);
+  opacity: 0;
+  /* Leaving: fades out quickly as the cover starts to lift */
+  transition: opacity 200ms ease;
+}
+.gift[data-show] {
+  opacity: 1;
+  transition: none;
+}
+
+/* The note, in ink on the cover */
+.note {
+  position: absolute;
+    top: calc(56 * var(--u));
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: calc(24 * var(--u));
+  line-height: calc(37 * var(--u));
+  color: var(--color-ink);
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+}
+
+.sig {
+  display: block;
+  margin-top: calc(10 * var(--u));
+  font-style: italic;
+  font-size: calc(22 * var(--u));
+  opacity: 0.75;
+}
+
+/* The pressed flower, standing up with a slight lean, between the note and the logo */
+.flower {
+  position: absolute;
+   top: calc(250 * var(--u));
+  left: 50%;
+    width: calc(200 * var(--u));
+  height: auto;
+  transform: translateX(-50%) rotate(10deg);
+}
+
+/* Only right after the cover swings shut: the note inks in, then the flower is placed */
+.gift[data-show][data-play] .note {
+  animation: ink-in 800ms ease 300ms both;
+}
+.gift[data-show][data-play] .flower {
+  animation: flower-place 900ms var(--ease-arrive) 1100ms both;
+}
+
+@keyframes ink-in {
+  from { opacity: 0; filter: blur(1px); }
+  to { opacity: 0.9; filter: blur(0); }
+}
+@keyframes flower-place {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* At rest: open shows the inside, shut shows the outside */
 .slot[data-shut] .inside {
   opacity: 0;
@@ -303,14 +374,17 @@
   .base,
   .slot[data-shut] .base,
   .leaf,
-  .slot[data-done] .leaf {
+  .slot[data-done] .leaf,
+  .gift {
     transition: none;
   }
   .slot[data-moving] .inside,
   .slot[data-moving] .outside,
   .slot[data-moving] .ground,
   .slot[data-moving] .shade,
-  .slot[data-moving] .cast {
+  .slot[data-moving] .cast,
+  .gift[data-show][data-play] .note,
+  .gift[data-show][data-play] .flower {
     animation: none;
   }
 }

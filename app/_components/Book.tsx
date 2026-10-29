@@ -212,6 +212,7 @@ export default function Book({ content }: BookProps) {
             <BackLeaf
               shut={backShut}
               done={backDone}
+              rested={backShutDone}
               inside={content[CHAPTERS[LAST].slug].right}
               onSettle={setBackSettledShut}
             />

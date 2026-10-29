@@ -61,6 +61,18 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 - Under the closed back: BackCoverBar in BookNav.tsx (← Contact ◆ The end · Read again →). Half the book wide, nudged left by 8 canvas px to sit under the logo, pushed down to clear the ribbon.
 - Phone shows the front cover on "/the-end" until Phase 2.
 
+## The thank-you (on the closed back cover)
+
+- Lives inside BackLeaf's outside (.gift), pre-flipped like the logo and on the same center line.
+- The note, in ink (IM Fell English), signed in italic:
+  "You stayed till the very end. / Thank you for being here, / I truly appreciate it. / Keep the flower, it's yours. / ~ Abdullah"
+- The flower is our own drawing: public/flower-sprig.svg (pressed rose-pink sprig, 3 flowers, 2 buds, 2 leaves, from Abdullah's sketch, Oct 29 2026).
+- Book.tsx passes rested (= back shut and resting). BackLeaf only plays the animation if it just swung shut (played state):
+  the note inks in (0.3s delay, 0.8s), then the flower fades in (1.1s delay, 0.9s). Fade only, no movement.
+- Direct visit or refresh on "/the-end", or reduced motion: note and flower are simply there.
+- Leaving: they fade out in 200ms as the cover starts to lift.
+- Phone: not yet (Phase 2).
+
 ## Shadow rules (learned the hard way, Oct 28 2026)
 
 - Never put a desk shadow ON something that swings. It swings through the air with it and looks like a dark slab.
@@ -78,12 +90,14 @@ How the Harbor diary turns pages. Read this before changing anything in the book
 4. Menu, page marker, "scroll or swipe" hint. DONE (Oct 28 2026)
    Menu: top nav + bottom bar always visible. Marker: "2 of 6" under the chapter name in the bottom bar.
    Hint: shows on the first chapter in the top bar until the first turn (hidden under 1200px wide).
-5. Cover opening, closing, flower thank-you (design each together first).
+5. Cover opening, closing, flower thank-you (design each together first). DONE (Oct 29 2026)
    5a. Cover moved inside the shared book. DONE (Oct 28 2026)
        On the cover: → or scroll down opens. On Introduction: ← or scroll up closes.
    5b. Cover swings open and shut like a real book. DONE (Oct 28 2026), shadows fixed same day.
    5c. Back cover: at Contact, → and "Close the book" close the back cover. DONE (Oct 28 2026)
-   5d. Flower thank-you after the back cover closes. TODO (agreed idea: a pressed jasmine slides out of the pages onto the desk, then "Thank you for reading")
+   5d. Flower thank-you on the closed back cover. DONE (Oct 29 2026). See "The thank-you" above.
+
+Phase 1 (laptop book engine) is complete. Next: Phase 2, phone.
 
 ## Open items
 
