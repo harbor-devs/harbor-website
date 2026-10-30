@@ -4,7 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "rea
 import { CHAPTERS, type ChapterSlug } from "../_lib/chapters";
 import { PAGE_H, PAGE_W, PageCurl, REGION, endX, type Point } from "../_lib/pageCurl";
 import { loadImage, paintSheet } from "../_lib/paintSheet";
-import PhoneCoverLeaf from "./PhoneCoverLeaf";
+import PhoneCoverLeaf, { type CoverSwing } from "./PhoneCoverLeaf";
 import styles from "./PhoneBook.module.css";
 
 // Each chapter has its own stain pattern baked into its paper image.
@@ -17,12 +17,6 @@ const PAPER: Record<ChapterSlug, string> = {
   contact: "/textures/page-phone-contact.webp",
 };
 
-// The front cover swinging on top of the page (only while it moves)
-type CoverSwing = {
-  open: boolean; // where it should end up
-  onSettle: (open: boolean) => void; // it got there
-};
-
 type PhoneBookProps = {
   pages: ReactNode[]; // every chapter's phone page, in reading order
   index: number; // the chapter the URL wants
@@ -30,7 +24,7 @@ type PhoneBookProps = {
   onArrive?: (index: number) => void; // the page that's showing now (on mount and after each turn)
   header?: ReactNode;
   footer?: ReactNode;
-  cover?: CoverSwing | null;
+  cover?: CoverSwing | null; // the front cover on top (only while it moves or is held)
 };
 
 const BOTTOM: Point = { x: PAGE_W, y: PAGE_H };
@@ -312,7 +306,7 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
     // The corner lifts a little and settles: shows the page can be folded
     function peek() {
       if (turn || drag || !canAnimate() || shown >= last) return;
-       begin(1, BOTTOM, false);
+      begin(1, BOTTOM, false);
       // begin() just set the turn, but TypeScript can't see that, so look again
       const started = turn as Turn | null;
       if (!started) return;
@@ -472,9 +466,7 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
         </div>
         <div ref={curlRef} aria-hidden="true" className={styles.curl} />
         <div ref={glRef} aria-hidden="true" className={styles.glHost} />
-        {cover && (
-          <PhoneCoverLeaf open={cover.open} onSettle={cover.onSettle} pageRef={pageRef} curlRef={curlRef} />
-        )}
+        {cover && <PhoneCoverLeaf {...cover} pageRef={pageRef} curlRef={curlRef} />}
         {footer && <div className={styles.footer}>{footer}</div>}
       </main>
     </div>

@@ -29,9 +29,13 @@
 }
 
 /* Phone shut cover: undo the diary page's shift to the right (that's room for
-   the curl, and a shut book has none). "main." makes this win over the page's rule. */
+   the curl, and a shut book has none). "main." makes this win over the page's rule.
+   pan-y: up/down still scrolls, sideways swipes come to us (to swing it open). */
 main.centered {
   translate: none;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .hint {

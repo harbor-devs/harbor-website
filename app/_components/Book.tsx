@@ -11,6 +11,7 @@ import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
 import PhoneBackCover from "./PhoneBackCover";
 import PhoneBook from "./PhoneBook";
+import type { CoverGrab } from "./PhoneCoverLeaf";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
 import TurnHint from "./TurnHint";
 
@@ -94,6 +95,8 @@ export default function Book({ content }: BookProps) {
   const [phoneAt, setPhoneAt] = useState(closed ? 0 : index);
   // Where the phone cover last finished swinging: true = open, false = shut
   const [phoneSettledOpen, setPhoneSettledOpen] = useState(!closed);
+  // A finger swinging the shut phone cover by hand (until it lands open or shut)
+  const [grab, setGrab] = useState<CoverGrab | null>(null);
 
   // From the back cover straight to the front cover ("Read again"):
   // no diary in between, so just rest shut, no swing.
@@ -256,13 +259,13 @@ export default function Book({ content }: BookProps) {
 
       {/* Below 900px: the shut front cover, the back cover, or the phone diary
           that curls page to page (with the front cover swinging on top of it
-          while it opens or closes). The diary only mounts on phone width, so
-          the laptop never holds a WebGL canvas for it. */}
+          while it opens, closes, or a finger holds it). The diary only mounts
+          on phone width, so the laptop never holds a WebGL canvas for it. */}
       <div className="flex flex-1 flex-col book:hidden">
         {backClosed ? (
           <PhoneBackCover />
-        ) : phoneShutDone ? (
-          <Cover />
+        ) : phoneShutDone && !grab ? (
+          <Cover onGrab={setGrab} />
         ) : (
           !laptop && (
             <PhoneBook
@@ -272,7 +275,23 @@ export default function Book({ content }: BookProps) {
               onArrive={setPhoneAt}
               header={<PhoneHeader current={phoneCoverDone ? chapter.slug : undefined} />}
               footer={phoneCoverDone ? <PhoneTurnBar nav={nav} /> : null}
-                          cover={phoneCoverDone ? null : { open: phoneCoverOpen, onSettle: setPhoneSettledOpen }}
+              cover={
+                phoneCoverDone && !grab
+                  ? null
+                  : {
+                      open: phoneCoverOpen,
+                      grab,
+                      // Landed (open or shut): the hand is done
+                      onSettle: (o) => {
+                        setPhoneSettledOpen(o);
+                        setGrab(null);
+                      },
+                      // Let go past halfway: the URL catches up while it finishes
+                      onLetGo: (o) => {
+                        if (o) router.push(CHAPTERS[0].href, { scroll: false });
+                      },
+                    }
+              }
             />
           )
         )}

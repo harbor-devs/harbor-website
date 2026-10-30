@@ -1,5 +1,6 @@
 /* Phone: the front cover swinging open on its spine, over the diary page.
-   The script moves the parts (transform + opacity only). Numbers are canvas px (--u). */
+   The cover is cut into strips joined by fold lines, so it curves mid-swing.
+   The script moves the parts (transform, opacity, visibility). Numbers are canvas px (--u). */
 
 .root {
   position: absolute;
@@ -23,6 +24,13 @@
   transform-origin: left center;
   transform-style: preserve-3d;
   will-change: transform;
+}
+
+/* A fold line: full cover size, turning on the line where its strip starts */
+.fold {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
 }
 
 .front,
