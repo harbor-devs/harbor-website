@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useEffectEvent, useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import ClosedBook from "./ClosedBook";
+import { BackBoard } from "./PhoneBackCover";
 import styles from "./PhoneCoverLeaf.module.css";
 
 const SWING_MS = 1300; // one full swing, shut to open
@@ -56,20 +57,22 @@ function draw(x: Parts, v: number) {
   x.page.style.translate = `${5 * v}% 0`; // shut = centered, open = room for the curl
 }
 
-// ---- The finger on the shut cover ----
-// Cover starts it, the leaf picks it up once it's on screen. It listens on the
-// whole window, so it keeps working while Cover is swapped for the diary.
+// ---- The finger on the cover ----
+// Opening: Cover starts it on the shut cover. Closing: PhoneBook starts it on
+// the first page. The leaf picks it up once it's on screen. It listens on the
+// whole window, so it keeps working while the screen underneath is swapped.
 export type CoverGrab = {
   startX: number; // where the finger went down (screen px)
   x: number; // where it is now
   vx: number; // its speed in px per ms (minus = moving left)
   up: boolean; // let go
   cancelled: boolean; // the browser took the touch over (e.g. it started scrolling)
+  closing: boolean; // grabbed on the open diary's first page, pulling the cover shut
   onChange: (() => void) | null; // the leaf listens here
 };
 
-export function grabCover(e: PointerEvent, startX: number): CoverGrab {
-  const g: CoverGrab = { startX, x: e.clientX, vx: 0, up: false, cancelled: false, onChange: null };
+export function grabCover(e: PointerEvent, startX: number, closing = false): CoverGrab {
+  const g: CoverGrab = { startX, x: e.clientX, vx: 0, up: false, cancelled: false, closing, onChange: null };
   const id = e.pointerId;
   let t = performance.now();
 
@@ -140,10 +143,11 @@ function swing(s: Swing, to: number, curve: (t: number) => number, done: () => v
 
 // What Book passes in (through PhoneBook)
 export type CoverSwing = {
+      side?: "front" | "back"; // which cover (back = the same swing mirrored, hinged on the right edge)
   open: boolean; // where the cover should end up (the URL)
   onSettle: (open: boolean) => void; // it got there
-  grab?: CoverGrab | null; // a finger grabbed the shut cover
-  onLetGo?: (open: boolean) => void; // the finger let go: true = it's going open
+  grab?: CoverGrab | null; // a finger grabbed the cover
+  onLetGo?: (open: boolean) => void; // the finger let go and it's changing sides: true = going open, false = going shut
 };
 
 type PhoneCoverLeafProps = CoverSwing & {
@@ -153,7 +157,15 @@ type PhoneCoverLeafProps = CoverSwing & {
 
 // Phone: the front cover swinging on its spine, on top of the diary's first page.
 // Only on screen while it moves or a finger holds it.
-export default function PhoneCoverLeaf({ open, onSettle, grab, onLetGo, pageRef, curlRef }: PhoneCoverLeafProps) {
+export default function PhoneCoverLeaf({
+  side = "front",
+  open,
+  onSettle,
+  grab,
+  onLetGo,
+  pageRef,
+  curlRef,
+}: PhoneCoverLeafProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const castRef = useRef<HTMLDivElement>(null);
@@ -161,8 +173,16 @@ export default function PhoneCoverLeaf({ open, onSettle, grab, onLetGo, pageRef,
   const frontRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shadeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const backRefs = useRef<(HTMLDivElement | null)[]>([]);
-  // Grabbed: starts shut, under the finger. Otherwise: opposite side of where it's going.
-  const s = useRef<Swing>({ parts: null, v: grab || open ? 0 : 1, raf: 0, aim: null, held: !!grab });
+  // Where it starts. Grabbed: where the finger found it (shut, or open when closing).
+  // Otherwise: the opposite side of where it's going.
+  const [startShut] = useState(grab ? !grab.closing : open);
+  const s = useRef<Swing>({
+    parts: null,
+    v: startShut ? 0 : 1,
+    raf: 0,
+    aim: null,
+    held: !!grab,
+  });
   const settle = useEffectEvent((o: boolean) => onSettle(o));
   const letGo = useEffectEvent((o: boolean) => onLetGo?.(o));
 
@@ -194,24 +214,45 @@ export default function PhoneCoverLeaf({ open, onSettle, grab, onLetGo, pageRef,
     };
   }, [pageRef, curlRef]);
 
-  // The finger: the cover's edge stays under it, so the spine is halfway.
+  // The finger.
+  // Opening: the cover's edge stays under it, so the spine is halfway.
   // Let go past the spine (or flick left) and it opens, otherwise it falls shut.
+  // Closing: the open cover is off screen on the left, so the finger pulls it
+  // over. Reaching the page's right edge = fully shut. Let go past halfway
+  // (or flick right) and it shuts, otherwise it falls back open.
   useEffect(() => {
     const st = s.current;
     const page = st.parts?.page;
     if (!grab || !page) return;
-    const r = page.getBoundingClientRect(); // shut and centered right now
-    const reach = Math.max(grab.startX - r.left, r.width * 0.5); // grab point to spine
+    const r = page.getBoundingClientRect();
+    const closing = grab.closing;
+    const reach = closing
+      ? Math.max((r.right - grab.startX) * 0.5, r.width * 0.25) // halfway from grab point to the right edge
+      : Math.max(grab.startX - r.left, r.width * 0.5); // grab point to spine
 
     const update = () => {
       if (!st.held || !st.parts) return;
       if (!grab.up) {
-        const k = 1 - (grab.startX - grab.x) / reach; // 1 = where it was grabbed, 0 = the spine
+        // k = where the cover's edge is, from -1 (open, flat on the left) to 1 (shut)
+        const k = closing ? -1 + (grab.x - grab.startX) / reach : 1 - (grab.startX - grab.x) / reach;
         st.v = Math.acos(Math.min(Math.max(k, -1), 1)) / Math.PI;
         draw(st.parts, st.v);
         return;
       }
       st.held = false;
+
+      if (closing) {
+        const shut =
+          !grab.cancelled && (grab.vx > FLICK ? st.v < 0.98 : grab.vx < -FLICK ? false : st.v < 0.5);
+        if (shut) {
+          swing(st, 0, easeOut, () => {}); // settles once the URL catches up (below)
+          letGo(false);
+        } else {
+          swing(st, 1, easeOut, () => settle(true));
+        }
+        return;
+      }
+
       const opened =
         !grab.cancelled && (grab.vx < -FLICK ? st.v > 0.02 : grab.vx > FLICK ? false : st.v > 0.5);
       if (opened) {
@@ -257,7 +298,9 @@ export default function PhoneCoverLeaf({ open, onSettle, grab, onLetGo, pageRef,
           className={styles.front}
           style={{ clipPath: `inset(0 ${cutR}% 0 ${cutL}%)` }}
         >
-          <ClosedBook phone bare />
+                    {/* Back: the note and flower only if it starts shut (they're already on the resting cover).
+              Closing, they ink in after it lands. */}
+          {side === "back" ? <BackBoard bare still gift={startShut} /> : <ClosedBook phone bare />}
           <div
             ref={(el) => {
               shadeRefs.current[i] = el;
@@ -291,7 +334,7 @@ export default function PhoneCoverLeaf({ open, onSettle, grab, onLetGo, pageRef,
   };
 
   return (
-    <div ref={rootRef} className={styles.root}>
+        <div ref={rootRef} className={styles.root} data-side={side}>
       <div ref={castRef} aria-hidden="true" className={styles.cast} />
       <div ref={boardRef} className={styles.board}>
         {strip(0)}

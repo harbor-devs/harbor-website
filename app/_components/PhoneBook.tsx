@@ -25,6 +25,9 @@ type PhoneBookProps = {
   header?: ReactNode;
   footer?: ReactNode;
   cover?: CoverSwing | null; // the front cover on top (only while it moves or is held)
+  // First page, swiping right: the finger grabs the front cover to close it.
+  // Null when closing isn't allowed right now.
+  onGrabCover?: ((e: PointerEvent, startX: number) => void) | null;
 };
 
 const BOTTOM: Point = { x: PAGE_W, y: PAGE_H };
@@ -64,6 +67,7 @@ type Turn = {
 type Drag = {
   id: number;
   start: Point;
+  sx: number; // where the finger went down (screen px)
   last: Point;
   lastT: number;
   vx: number;
@@ -75,7 +79,16 @@ type Drag = {
 // The phone diary: one page at a time, turned with the WebGL curl.
 // Same rule as the laptop: the URL is the boss. Turning by hand changes the URL,
 // and a URL change (bottom bar, menu, Back) turns the page to match.
-export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, footer, cover }: PhoneBookProps) {
+export default function PhoneBook({
+  pages,
+  index,
+  onUserTurn,
+  onArrive,
+  header,
+  footer,
+  cover,
+  onGrabCover,
+}: PhoneBookProps) {
   const pageRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<HTMLDivElement>(null);
@@ -91,6 +104,12 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
   const arrived = useEffectEvent((i: number) => onArrive?.(i));
   // The cover is swinging: hold heavy work so the swing stays smooth
   const coverMoving = useEffectEvent(() => !!cover);
+  // Hand the finger to the front cover. False if closing isn't allowed right now.
+  const grabFront = useEffectEvent((e: PointerEvent, startX: number) => {
+    if (!onGrabCover) return false;
+    onGrabCover(e, startX);
+    return true;
+  });
 
   useEffect(() => {
     const page = pageRef.current;
@@ -331,7 +350,17 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
       stopHint();
       if (turn) return;
       const p = toPage(e);
-      drag = { id: e.pointerId, start: p, last: p, lastT: now(), vx: 0, dir: 0, C: BOTTOM, plain: false };
+      drag = {
+        id: e.pointerId,
+        start: p,
+        sx: e.clientX,
+        last: p,
+        lastT: now(),
+        vx: 0,
+        dir: 0,
+        C: BOTTOM,
+        plain: false,
+      };
     }
 
     function onMove(e: PointerEvent) {
@@ -351,6 +380,9 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
         const dir = dx < 0 ? 1 : -1;
         if ((dir > 0 && shown >= last) || (dir < 0 && shown <= 0)) {
           drag = null;
+          // First page, swiping right: no page to turn back, so the front cover
+          // comes over instead (it follows the finger from here, on window)
+          if (dir < 0 && shown === 0 && getTarget() === 0 && grabFront(e, d.sx)) suppressClick = true;
           return;
         }
         d.dir = dir;
@@ -466,7 +498,7 @@ export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, 
         </div>
         <div ref={curlRef} aria-hidden="true" className={styles.curl} />
         <div ref={glRef} aria-hidden="true" className={styles.glHost} />
-        {cover && <PhoneCoverLeaf {...cover} pageRef={pageRef} curlRef={curlRef} />}
+        {cover && <PhoneCoverLeaf key={cover.side ?? "front"} {...cover} pageRef={pageRef} curlRef={curlRef} />}
         {footer && <div className={styles.footer}>{footer}</div>}
       </main>
     </div>

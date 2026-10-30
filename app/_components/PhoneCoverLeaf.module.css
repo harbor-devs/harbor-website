@@ -8,7 +8,11 @@
   z-index: 3;
   perspective: calc(1400 * var(--u));
 }
-
+/* Back cover: the same swing, mirrored. Hinged on the page's right edge, it
+   swings in from the right, and the spine ends up on the right like the resting back cover. */
+.root[data-side="back"] {
+  transform: scaleX(-1);
+}
 /* The cover's shadow on the page while it's lifted */
 .cast {
   position: absolute;

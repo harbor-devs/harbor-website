@@ -11,7 +11,7 @@ import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
 import PhoneBackCover from "./PhoneBackCover";
 import PhoneBook from "./PhoneBook";
-import type { CoverGrab } from "./PhoneCoverLeaf";
+import { grabCover, type CoverGrab } from "./PhoneCoverLeaf";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
 import TurnHint from "./TurnHint";
 
@@ -95,17 +95,20 @@ export default function Book({ content }: BookProps) {
   const [phoneAt, setPhoneAt] = useState(closed ? 0 : index);
   // Where the phone cover last finished swinging: true = open, false = shut
   const [phoneSettledOpen, setPhoneSettledOpen] = useState(!closed);
-  // A finger swinging the shut phone cover by hand (until it lands open or shut)
+  // Where the phone back cover last finished swinging: true = shut, false = open
+  const [phoneBackSettledShut, setPhoneBackSettledShut] = useState(backClosed);
+  // A finger swinging the phone cover by hand, open or shut (until it lands)
   const [grab, setGrab] = useState<CoverGrab | null>(null);
 
   // From the back cover straight to the front cover ("Read again"):
-  // no diary in between, so just rest shut, no swing.
+  // no diary in between, so both covers just rest, no swing.
   const [prevPath, setPrevPath] = useState(pathname);
   if (pathname !== prevPath) {
     setPrevPath(pathname);
     if (closed && prevPath === BACK_COVER_HREF) {
       setPhoneAt(0);
       setPhoneSettledOpen(false);
+      setPhoneBackSettledShut(false);
     }
   }
 
@@ -113,8 +116,22 @@ export default function Book({ content }: BookProps) {
   const phoneCoverOpen = !closed || phoneAt !== 0;
   const phoneCoverDone = phoneCoverOpen && (reduced || phoneSettledOpen);
   const phoneShutDone = !phoneCoverOpen && (reduced || !phoneSettledOpen);
-  // The diary stays on chapter one until the cover is fully open
-  const phoneIndex = closed ? 0 : phoneCoverDone ? index : 0;
+
+  // --- The phone back cover (same idea as the laptop one above) ---
+  // Only shuts once the front is open and the diary is on the last chapter
+  const phoneBackShut = backClosed && phoneCoverDone && phoneAt === LAST;
+  // Open and resting: the real last page shows
+  const phoneBackDone = !phoneBackShut && (reduced || !phoneBackSettledShut);
+  // Shut and resting
+  const phoneBackShutDone = phoneBackShut && (reduced || phoneBackSettledShut);
+
+  // Where the diary goes. It stays on the last chapter until the back cover is
+  // fully open, and on chapter one until the front cover is fully open.
+  const phoneIndex = !phoneBackDone ? LAST : closed ? 0 : phoneCoverDone ? index : 0;
+  // Fully open on a chapter: neither cover in the way or moving
+  const phoneOpen = phoneCoverDone && phoneBackDone;
+  // Resting open on the first chapter: a right swipe there pulls the cover shut
+  const canGrabShut = phoneOpen && !grab && index === 0;
 
   // Where "next" and "previous" go from here.
   // Front shut: next opens. First chapter: previous closes the front.
@@ -257,12 +274,12 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-      {/* Below 900px: the shut front cover, the back cover, or the phone diary
-          that curls page to page (with the front cover swinging on top of it
+            {/* Below 900px: the resting front cover, the resting back cover, or the
+          phone diary that curls page to page (with a cover swinging on top of it
           while it opens, closes, or a finger holds it). The diary only mounts
           on phone width, so the laptop never holds a WebGL canvas for it. */}
       <div className="flex flex-1 flex-col book:hidden">
-        {backClosed ? (
+        {phoneBackShutDone ? (
           <PhoneBackCover />
         ) : phoneShutDone && !grab ? (
           <Cover onGrab={setGrab} />
@@ -273,12 +290,12 @@ export default function Book({ content }: BookProps) {
               index={phoneIndex}
               onUserTurn={(i) => router.push(CHAPTERS[i].href, { scroll: false })}
               onArrive={setPhoneAt}
-              header={<PhoneHeader current={phoneCoverDone ? chapter.slug : undefined} />}
-              footer={phoneCoverDone ? <PhoneTurnBar nav={nav} /> : null}
+              header={<PhoneHeader current={phoneOpen ? chapter.slug : undefined} />}
+              footer={phoneOpen && !grab ? <PhoneTurnBar nav={nav} /> : null}
+              onGrabCover={canGrabShut ? (e, startX) => setGrab(grabCover(e, startX, true)) : null}
               cover={
-                phoneCoverDone && !grab
-                  ? null
-                  : {
+                !phoneCoverDone || grab
+                  ? {
                       open: phoneCoverOpen,
                       grab,
                       // Landed (open or shut): the hand is done
@@ -288,14 +305,21 @@ export default function Book({ content }: BookProps) {
                       },
                       // Let go past halfway: the URL catches up while it finishes
                       onLetGo: (o) => {
-                        if (o) router.push(CHAPTERS[0].href, { scroll: false });
+                        router.push(o ? CHAPTERS[0].href : COVER_HREF, { scroll: false });
                       },
                     }
+                  : !phoneBackDone
+                    ? {
+                        side: "back",
+                        // "open" means the book is open, so the back cover is off the page
+                        open: !phoneBackShut,
+                        onSettle: (o) => setPhoneBackSettledShut(!o),
+                      }
+                    : null
               }
             />
           )
         )}
-      </div>
-    </>
+      </div>'</>
   );
 }
