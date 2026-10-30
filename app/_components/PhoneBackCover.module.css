@@ -1,0 +1,126 @@
+/* Phone back cover. Numbers are the laptop back cover's canvas pixels
+   (board 518.75 x 664), so it looks exactly like BackLeaf's outside.
+   --u (1 canvas pixel) comes from this box's width. */
+
+/* Lets the book measure its own width (100cqw) */
+.size {
+  container-type: inline-size;
+}
+
+.book {
+  --u: calc(100cqw / 518.75);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 518.75 / 664;
+  /* Spine on the right, like a real back cover */
+  transform: scaleX(-1);
+}
+
+/* The baked cover image: board, page edges, ribbon, shadow (mirrored with the book) */
+.texture {
+  position: absolute;
+  left: calc(-83 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* Small faded logo, low on the back. Flipped back so it reads the right way. */
+.mark {
+  position: absolute;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  bottom: calc(84 * var(--u));
+  display: flex;
+  justify-content: center;
+  transform: scaleX(-1);
+}
+
+.logo {
+  width: calc(64 * var(--u));
+  height: auto;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* The thank-you: same box and flip as .mark, so all three share one center line */
+.gift {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  transform: scaleX(-1);
+}
+
+/* The note, in ink on the cover */
+.note {
+  position: absolute;
+  top: calc(56 * var(--u));
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: calc(24 * var(--u));
+  line-height: calc(37 * var(--u));
+  color: var(--color-ink);
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+  animation: ink-in 800ms ease 300ms both;
+}
+
+.sig {
+  display: block;
+  margin-top: calc(10 * var(--u));
+  font-style: italic;
+  font-size: calc(22 * var(--u));
+  opacity: 0.75;
+}
+
+/* The pressed flower, standing up with a slight lean, between the note and the logo */
+.flower {
+  position: absolute;
+  top: calc(250 * var(--u));
+  left: 50%;
+  width: calc(200 * var(--u));
+  height: auto;
+  transform: translateX(-50%) rotate(10deg);
+  animation: flower-place 900ms var(--ease-arrive) 1100ms both;
+}
+
+@keyframes ink-in {
+  from { opacity: 0; filter: blur(1px); }
+  to { opacity: 0.9; filter: blur(0); }
+}
+@keyframes flower-place {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* "Contact / Read again" under the book, same gap as "Tap to open".
+   The laptop sizes this bar to half the open book; on phone it takes the
+   full width, centered, and each link stays on one line. */
+.bar {
+  margin-top: 48px;
+  width: 100%;
+}
+
+.bar nav {
+  width: 100%;
+  margin-left: 0;
+  padding-top: 0;
+}
+
+.bar a {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note,
+  .flower {
+    animation: none;
+  }
+}

@@ -9,6 +9,7 @@ import BookSpread from "./BookSpread";
 import Cover, { CoverHint } from "./Cover";
 import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
+import PhoneBackCover from "./PhoneBackCover";
 import PhoneBook from "./PhoneBook";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
 import TurnHint from "./TurnHint";
@@ -229,12 +230,14 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-      {/* Below 900px: the closed cover, or the phone diary that curls page to page.
-          Only mounted on phone width, so the laptop never holds a WebGL canvas for it.
-          The back cover still shows the front cover on phone for now. */}
+      {/* Below 900px: the front cover, the back cover, or the phone diary that
+          curls page to page. The diary only mounts on phone width, so the laptop
+          never holds a WebGL canvas for it. */}
       <div className="flex flex-1 flex-col book:hidden">
-        {closed || backClosed ? (
+        {closed ? (
           <Cover />
+        ) : backClosed ? (
+          <PhoneBackCover />
         ) : (
           !laptop && (
             <PhoneBook
