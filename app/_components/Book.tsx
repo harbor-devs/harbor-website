@@ -9,7 +9,7 @@ import BookSpread from "./BookSpread";
 import Cover, { CoverHint } from "./Cover";
 import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
-import PhonePage from "./PhonePage";
+import PhoneBook from "./PhoneBook";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
 import TurnHint from "./TurnHint";
 
@@ -178,6 +178,8 @@ export default function Book({ content }: BookProps) {
 
   // Laptop: every chapter's two pages, in reading order
   const pages = CHAPTERS.flatMap((c) => [content[c.slug].left, content[c.slug].right]);
+  // Phone: every chapter's one page, in reading order
+  const phonePages = CHAPTERS.map((c) => content[c.slug].phone);
 
   return (
     <>
@@ -227,19 +229,22 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-      {/* Below 900px: the closed cover, or one phone page (its own turn comes in Phase 2).
-          The back cover shows the front cover on phone until then. */}
+      {/* Below 900px: the closed cover, or the phone diary that curls page to page.
+          Only mounted on phone width, so the laptop never holds a WebGL canvas for it.
+          The back cover still shows the front cover on phone for now. */}
       <div className="flex flex-1 flex-col book:hidden">
         {closed || backClosed ? (
           <Cover />
         ) : (
-          <PhonePage
-            slug={chapter.slug}
-            header={<PhoneHeader current={chapter.slug} />}
-            footer={<PhoneTurnBar nav={nav} />}
-          >
-            {content[chapter.slug].phone}
-          </PhonePage>
+          !laptop && (
+            <PhoneBook
+              pages={phonePages}
+              index={index}
+              onUserTurn={(i) => router.push(CHAPTERS[i].href, { scroll: false })}
+              header={<PhoneHeader current={chapter.slug} />}
+              footer={<PhoneTurnBar nav={nav} />}
+            />
+          )
         )}
       </div>
     </>
