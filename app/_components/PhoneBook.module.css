@@ -27,7 +27,8 @@
     calc((100dvh - var(--chrome-top) - var(--chrome-bottom)) * 330 / 467)
   );
   aspect-ratio: 330 / 467;
-  /* Shift right by half of (curl - edge), so page + curl look centered together */
+  /* Shift right by half of (curl - edge), so page + curl look centered together.
+     (The swinging front cover moves this itself while it opens or closes.) */
   translate: 5% 0;
   container-type: inline-size;
   /* 1 canvas pixel */
@@ -96,7 +97,8 @@
   visibility: visible;
 }
 
-/* Pages folded back around the left edge (image includes its shadow) */
+/* Pages folded back around the left edge (image includes its shadow).
+   The swinging front cover fades this in and out itself. */
 .curl {
   position: absolute;
   left: calc(-70 * var(--u));

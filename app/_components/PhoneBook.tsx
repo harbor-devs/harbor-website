@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "rea
 import { CHAPTERS, type ChapterSlug } from "../_lib/chapters";
 import { PAGE_H, PAGE_W, PageCurl, REGION, endX, type Point } from "../_lib/pageCurl";
 import { loadImage, paintSheet } from "../_lib/paintSheet";
+import PhoneCoverLeaf from "./PhoneCoverLeaf";
 import styles from "./PhoneBook.module.css";
 
 // Each chapter has its own stain pattern baked into its paper image.
@@ -16,12 +17,20 @@ const PAPER: Record<ChapterSlug, string> = {
   contact: "/textures/page-phone-contact.webp",
 };
 
+// The front cover swinging on top of the page (only while it moves)
+type CoverSwing = {
+  open: boolean; // where it should end up
+  onSettle: (open: boolean) => void; // it got there
+};
+
 type PhoneBookProps = {
   pages: ReactNode[]; // every chapter's phone page, in reading order
   index: number; // the chapter the URL wants
   onUserTurn: (index: number) => void; // the visitor turned a page by hand
+  onArrive?: (index: number) => void; // the page that's showing now (on mount and after each turn)
   header?: ReactNode;
   footer?: ReactNode;
+  cover?: CoverSwing | null;
 };
 
 const BOTTOM: Point = { x: PAGE_W, y: PAGE_H };
@@ -72,10 +81,11 @@ type Drag = {
 // The phone diary: one page at a time, turned with the WebGL curl.
 // Same rule as the laptop: the URL is the boss. Turning by hand changes the URL,
 // and a URL change (bottom bar, menu, Back) turns the page to match.
-export default function PhoneBook({ pages, index, onUserTurn, header, footer }: PhoneBookProps) {
+export default function PhoneBook({ pages, index, onUserTurn, onArrive, header, footer, cover }: PhoneBookProps) {
   const pageRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<HTMLDivElement>(null);
+  const curlRef = useRef<HTMLDivElement>(null);
   const sheetRefs = useRef<(HTMLDivElement | null)[]>([]);
   // The page showing when this first appears. After that our code swaps pages itself.
   const [startIndex] = useState(index);
@@ -84,6 +94,9 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
 
   const getTarget = useEffectEvent(() => index);
   const userTurned = useEffectEvent((i: number) => onUserTurn(i));
+  const arrived = useEffectEvent((i: number) => onArrive?.(i));
+  // The cover is swinging: hold heavy work so the swing stays smooth
+  const coverMoving = useEffectEvent(() => !!cover);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -113,6 +126,9 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
     let hintStarted = false;
     let alive = true;
     let suppressClick = false;
+
+    // Tell the book where we start
+    arrived(shown);
 
     const now = () => performance.now();
     const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -162,12 +178,19 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
       }
     }
 
-    const resizer = new ResizeObserver(() => {
-      layout();
+    // Paint soon, but never while the cover is swinging (it's heavy work)
+    function schedulePaint(ms: number) {
       window.clearTimeout(paintTimer);
       paintTimer = window.setTimeout(() => {
-        if (alive) paint();
-      }, 150);
+        if (!alive) return;
+        if (coverMoving()) schedulePaint(250);
+        else paint();
+      }, ms);
+    }
+
+    const resizer = new ResizeObserver(() => {
+      layout();
+      schedulePaint(150);
     });
     resizer.observe(page);
 
@@ -236,6 +259,7 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
       if (!t) return;
       if (done) shown += t.dir;
       reset();
+      if (done) arrived(shown);
       // Turned by hand: the URL catches up. Otherwise keep going toward the URL.
       if (t.byHand && done) userTurned(shown);
       else goTo();
@@ -263,6 +287,7 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
       if (!canAnimate()) {
         shown = target;
         show(shown);
+        arrived(shown);
         return;
       }
       const ms = Math.abs(target - shown) > 1 ? RIFFLE_MS : TURN_MS;
@@ -287,9 +312,11 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
     // The corner lifts a little and settles: shows the page can be folded
     function peek() {
       if (turn || drag || !canAnimate() || shown >= last) return;
-      begin(1, BOTTOM, false);
-      if (!turn) return;
-      turn.peek = true;
+       begin(1, BOTTOM, false);
+      // begin() just set the turn, but TypeScript can't see that, so look again
+      const started = turn as Turn | null;
+      if (!started) return;
+      started.peek = true;
       const up = { x: PAGE_W - 30, y: PAGE_H - 22 };
       animate([BOTTOM, up], 520, easeOut, () => {
         animate([up, up], 260, linear, () => {
@@ -443,8 +470,11 @@ export default function PhoneBook({ pages, index, onUserTurn, header, footer }: 
             </div>
           ))}
         </div>
-        <div aria-hidden="true" className={styles.curl} />
+        <div ref={curlRef} aria-hidden="true" className={styles.curl} />
         <div ref={glRef} aria-hidden="true" className={styles.glHost} />
+        {cover && (
+          <PhoneCoverLeaf open={cover.open} onSettle={cover.onSettle} pageRef={pageRef} curlRef={curlRef} />
+        )}
         {footer && <div className={styles.footer}>{footer}</div>}
       </main>
     </div>

@@ -89,6 +89,30 @@ export default function Book({ content }: BookProps) {
   // and for the front cover to be fully open before leaving the first chapter.
   const flipTarget = !backDone ? LAST : closed ? 0 : coverDone ? index : 0;
 
+  // --- The phone front cover (same idea as the laptop one above) ---
+  // Which page the phone diary is actually on (it tells us after each turn)
+  const [phoneAt, setPhoneAt] = useState(closed ? 0 : index);
+  // Where the phone cover last finished swinging: true = open, false = shut
+  const [phoneSettledOpen, setPhoneSettledOpen] = useState(!closed);
+
+  // From the back cover straight to the front cover ("Read again"):
+  // no diary in between, so just rest shut, no swing.
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (pathname !== prevPath) {
+    setPrevPath(pathname);
+    if (closed && prevPath === BACK_COVER_HREF) {
+      setPhoneAt(0);
+      setPhoneSettledOpen(false);
+    }
+  }
+
+  // Closing from a later chapter: pages riffle back to chapter one first
+  const phoneCoverOpen = !closed || phoneAt !== 0;
+  const phoneCoverDone = phoneCoverOpen && (reduced || phoneSettledOpen);
+  const phoneShutDone = !phoneCoverOpen && (reduced || !phoneSettledOpen);
+  // The diary stays on chapter one until the cover is fully open
+  const phoneIndex = closed ? 0 : phoneCoverDone ? index : 0;
+
   // Where "next" and "previous" go from here.
   // Front shut: next opens. First chapter: previous closes the front.
   // Last chapter: next closes the back. Back shut: previous opens it again.
@@ -230,22 +254,25 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-      {/* Below 900px: the front cover, the back cover, or the phone diary that
-          curls page to page. The diary only mounts on phone width, so the laptop
-          never holds a WebGL canvas for it. */}
+      {/* Below 900px: the shut front cover, the back cover, or the phone diary
+          that curls page to page (with the front cover swinging on top of it
+          while it opens or closes). The diary only mounts on phone width, so
+          the laptop never holds a WebGL canvas for it. */}
       <div className="flex flex-1 flex-col book:hidden">
-        {closed ? (
-          <Cover />
-        ) : backClosed ? (
+        {backClosed ? (
           <PhoneBackCover />
+        ) : phoneShutDone ? (
+          <Cover />
         ) : (
           !laptop && (
             <PhoneBook
               pages={phonePages}
-              index={index}
+              index={phoneIndex}
               onUserTurn={(i) => router.push(CHAPTERS[i].href, { scroll: false })}
-              header={<PhoneHeader current={chapter.slug} />}
-              footer={<PhoneTurnBar nav={nav} />}
+              onArrive={setPhoneAt}
+              header={<PhoneHeader current={phoneCoverDone ? chapter.slug : undefined} />}
+              footer={phoneCoverDone ? <PhoneTurnBar nav={nav} /> : null}
+                          cover={phoneCoverDone ? null : { open: phoneCoverOpen, onSettle: setPhoneSettledOpen }}
             />
           )
         )}
