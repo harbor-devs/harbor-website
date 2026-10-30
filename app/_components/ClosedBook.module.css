@@ -13,6 +13,12 @@
   transition: transform var(--duration-base) var(--ease-arrive);
 }
 
+/* Phone: the diary page's shape (330 x 467), a bit taller than the laptop cover.
+   Widths still use --u; heights below switch to % so the image stretches to fit. */
+.book[data-phone] {
+  aspect-ratio: 330 / 467;
+}
+
 /* Small lift so it feels like you can pick it up */
 .book:hover {
   transform: translateY(-4px);
@@ -49,10 +55,21 @@
   pointer-events: none;
 }
 
+/* Phone: same image, stretched taller. 80/640 = 12.5% above, 840/640 = 131.25% tall. */
+.book[data-phone] .texture {
+  top: -12.5%;
+  height: 131.25%;
+}
+
 /* Bare: cut the image down to exactly the cover board
    (drops page edges, ribbon and shadow, which stay on the desk) */
 .book[data-bare] .texture {
   clip-path: inset(calc(80 * var(--u)) calc(80 * var(--u)) calc(120 * var(--u)) calc(80 * var(--u)));
+}
+
+/* Bare on phone: same cut, in % of the stretched image (80/840, 80/660, 120/840) */
+.book[data-bare][data-phone] .texture {
+  clip-path: inset(9.524% 12.121% 14.286% 12.121%);
 }
 
 /* Leather spine with the sideways title */
@@ -89,6 +106,11 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+/* Phone: the taller cover has spare room, keep the text in the middle */
+.book[data-phone] .face {
+  justify-content: center;
 }
 
 .kicker {

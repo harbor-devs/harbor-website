@@ -1,5 +1,5 @@
-/* Phone cover layout: header on top, book in the middle, hint under it.
-   Also the laptop "Click to open" hint. */
+/* Phone back cover layout (stage, header, main, bookWrap), the phone
+   "Tap to open" slot, and the laptop "Click to open" hint. */
 
 .stage {
   flex: 1;
@@ -28,6 +28,12 @@
   width: min(500px, calc(100vw - 80px), calc((100dvh - var(--chrome)) * 500 / 640));
 }
 
+/* Phone shut cover: undo the diary page's shift to the right (that's room for
+   the curl, and a shut book has none). "main." makes this win over the page's rule. */
+main.centered {
+  translate: none;
+}
+
 .hint {
   margin: 48px 0 0;
   display: flex;
@@ -43,6 +49,17 @@
 
 .hint:hover {
   color: var(--color-paper);
+}
+
+/* Phone: "Tap to open" in the diary's bottom slot, under the cover */
+.phoneHintSlot {
+  display: flex;
+  justify-content: center;
+  padding-top: 36px;
+}
+
+.phoneHintSlot .hint {
+  margin: 0;
 }
 
 /* Laptop: under the closed cover, which sits on the right half of the book */

@@ -8,17 +8,21 @@ type ClosedBookProps = {
   // Only the cover board itself: no page edges, ribbon or shadow around it.
   // The swinging cover uses this, because those parts stay with the pages.
   bare?: boolean;
+  // Phone: same shape as the phone diary page (330 x 467), so the cover
+  // sits exactly on top of the first page.
+  phone?: boolean;
 };
 
 // The closed diary on the cover page. The whole book is one link to chapter one.
 // The look (spine, paper, frame, ribbon) is one baked image; the text is real HTML on top.
 // Cover text is aria-hidden: the page has its own hidden <h1>, and the link says what it does.
-export default function ClosedBook({ bare = false }: ClosedBookProps) {
+export default function ClosedBook({ bare = false, phone = false }: ClosedBookProps) {
   return (
     <Link
       href={CHAPTERS[0].href}
       className={styles.book}
       data-bare={bare || undefined}
+      data-phone={phone || undefined}
       aria-label="Open the book"
     >
       <span aria-hidden="true" className={styles.texture} />
