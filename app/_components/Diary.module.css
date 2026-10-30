@@ -1,5 +1,5 @@
 /* Shared text styles for diary pages. Numbers are canvas pixels.
-   --u comes from BookSpread (laptop) or PhonePage (phone).
+   --u comes from BookSpread (laptop) or PhoneBook (phone).
    "Phone" classes exist only where the canvas uses different sizes. */
 
 /* Small red label above a title, like "Chapter I" */
