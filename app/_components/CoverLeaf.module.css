@@ -1,6 +1,8 @@
 /* The swinging cover. Numbers are canvas pixels of the open book (1060 x 664).
    Closed, the cover sits on the right half with its left edge on the spine.
-   Open, it lies on the left half, exactly over the board and left page. */
+   Open, it lies on the left half, exactly over the board and left page.
+   These rules are the two resting states (shut and open). While it swings,
+   CoverLeaf.tsx writes every moving part straight onto the elements. */
 
 .slot {
   position: absolute;
@@ -28,19 +30,15 @@
   mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
   mask-clip: content-box, border-box;
   mask-composite: exclude;
-  /* Closing: comes back as the cover lands */
-  transition: opacity 300ms ease 800ms;
 }
-/* Opening: hands over to the open book's own page edges as the cover lifts */
+/* Open: the open book's own page edges have taken over */
 .slot[data-open] .base {
   opacity: 0;
-  transition: opacity 300ms ease;
 }
 
 /* ---------- The left half's shadow on the desk ----------
    The open book's shadow is two halves: this one (left) and .shadowRight
-   in BookSpread. This half lives here because it arrives with the cover:
-   fades in as the cover comes down, fades out as it lifts.
+   in BookSpread. This half lives here because it arrives with the cover.
    It sits above the pages, so it's cut away only where it would darken
    the right page (right of the spine, inside the book's height). */
 
@@ -74,21 +72,6 @@
   opacity: 0;
   transition: opacity 300ms ease 800ms;
 }
-.slot[data-moving][data-open] .ground {
-  animation: ground-landing var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .ground {
-  animation: ground-lifting var(--duration-cover) linear;
-}
-
-@keyframes ground-landing {
-  0%, 55% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@keyframes ground-lifting {
-  0% { opacity: 1; }
-  45%, 100% { opacity: 0; }
-}
 
 /* ---------- The cover ---------- */
 
@@ -101,10 +84,6 @@
   height: calc(664 * var(--u));
   transform-origin: left center;
   pointer-events: auto;
-  transition:
-    transform var(--duration-cover) var(--ease-turn),
-    opacity 0s,
-    visibility 0s;
 }
 
 /* Swung over to the left */
@@ -118,7 +97,6 @@
   opacity: 0;
   visibility: hidden;
   transition:
-    transform var(--duration-cover) var(--ease-turn),
     opacity 200ms ease,
     visibility 0s linear 200ms;
 }
@@ -149,38 +127,6 @@
 }
 .slot[data-open] .back {
   opacity: 1;
-}
-
-/* While swinging: swap outside/inside exactly at the halfway point (edge-on).
-   Runs on the graphics card together with the swing, so it can't drift. */
-.slot[data-moving][data-open] .front {
-  animation: front-opening var(--duration-cover) linear;
-}
-.slot[data-moving][data-open] .back {
-  animation: back-opening var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .front {
-  animation: front-closing var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .back {
-  animation: back-closing var(--duration-cover) linear;
-}
-
-@keyframes front-opening {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
-@keyframes back-opening {
-  0%, 50% { opacity: 0; }
-  50.01%, 100% { opacity: 1; }
-}
-@keyframes front-closing {
-  0%, 50% { opacity: 0; }
-  50.01%, 100% { opacity: 1; }
-}
-@keyframes back-closing {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
 }
 
 /* Page stack edges under the left page. Exact copy of .stackLeft in
@@ -216,7 +162,7 @@
   height: calc(640 * var(--u));
 }
 
-/* ---------- Light and shadow (only while swinging) ---------- */
+/* ---------- Light and shadow (only while swinging, set by CoverLeaf.tsx) ---------- */
 
 /* As the cover turns away from the light, its free edge darkens first,
    while the side by the spine stays lit. Strongest when edge-on. */
@@ -236,13 +182,6 @@
   background: linear-gradient(to left, rgba(26, 16, 9, 0.08), rgba(26, 16, 9, 0.55));
 }
 
-.slot[data-moving][data-open] .shade {
-  animation: shade-opening var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .shade {
-  animation: shade-closing var(--duration-cover) linear;
-}
-
 /* Soft shadow on the right page, close to the spine, while the cover is just above it */
 .cast {
   position: absolute;
@@ -258,50 +197,11 @@
   );
   opacity: 0;
 }
-.slot[data-moving][data-open] .cast {
-  animation: cast-opening var(--duration-cover) linear;
-}
-.slot[data-moving]:not([data-open]) .cast {
-  animation: cast-closing var(--duration-cover) linear;
-}
-
-/* Two names with the same steps, so the animation restarts when the direction changes */
-@keyframes shade-opening {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
-}
-@keyframes shade-closing {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes cast-opening {
-  0% { opacity: 1; }
-  40% { opacity: 0; }
-  100% { opacity: 0; }
-}
-@keyframes cast-closing {
-  0% { opacity: 0; }
-  60% { opacity: 0; }
-  100% { opacity: 1; }
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .base,
-  .slot[data-open] .base,
   .slot[data-open] .ground,
   .slot[data-hide-ground] .ground,
-  .leaf,
   .slot[data-done] .leaf {
     transition: none;
-  }
-  .slot[data-moving] .front,
-  .slot[data-moving] .back,
-  .slot[data-moving] .ground,
-  .slot[data-moving] .shade,
-  .slot[data-moving] .cast {
-    animation: none;
   }
 }

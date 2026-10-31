@@ -255,6 +255,7 @@ export default function Book({ content }: BookProps) {
               open={coverOpen}
               done={coverDone}
               hideGround={backShut}
+              instant={instant}
               inside={content[CHAPTERS[0].slug].left}
               onSettle={setSettledOpen}
             />

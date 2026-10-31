@@ -1,0 +1,82 @@
+// The laptop covers' swing, run by JavaScript instead of CSS, so later a mouse
+// can hold a cover anywhere along the way and let it finish from there.
+
+// One full swing, shut to open. Keep the same as --duration-cover in globals.css.
+export const COVER_MS = 1100;
+
+// Same as CSS cubic-bezier(): returns a curve that takes time (0 to 1) and gives progress (0 to 1)
+export function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
+  const at = (t: number, p1: number, p2: number) =>
+    ((1 - 3 * p2 + 3 * p1) * t + (3 * p2 - 6 * p1)) * t * t + 3 * p1 * t;
+  const slope = (t: number, p1: number, p2: number) =>
+    3 * (1 - 3 * p2 + 3 * p1) * t * t + 2 * (3 * p2 - 6 * p1) * t + 3 * p1;
+
+  return (x: number) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    // Find the t where the curve is at x (Newton's method, fast)...
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const dx = at(t, x1, x2) - x;
+      if (Math.abs(dx) < 1e-5) return at(t, y1, y2);
+      const d = slope(t, x1, x2);
+      if (Math.abs(d) < 1e-6) break;
+      t -= dx / d;
+    }
+    // ...or by halving the range if that didn't settle
+    let lo = 0;
+    let hi = 1;
+    t = x;
+    while (hi - lo > 1e-5) {
+      if (at(t, x1, x2) < x) lo = t;
+      else hi = t;
+      t = (lo + hi) / 2;
+    }
+    return at(t, y1, y2);
+  };
+}
+
+// --ease-turn in globals.css
+export const easeTurn = cubicBezier(0.65, 0, 0.35, 1);
+
+// 0 before a, 1 after b, a straight line in between
+export const ramp = (a: number, b: number, x: number) => Math.min(Math.max((x - a) / (b - a), 0), 1);
+
+// One swing at a time
+export type Swing = {
+  v: number; // where the cover is now (0 = shut, 1 = open)
+  raf: number;
+  aim: { to: number; done: () => void } | null; // the swing that's running
+};
+
+// A new swing starts from wherever the cover is, so nothing jumps
+export function runSwing(
+  s: Swing,
+  to: number,
+  draw: (v: number) => void,
+  done: () => void,
+  curve: (t: number) => number = easeTurn,
+) {
+  cancelAnimationFrame(s.raf);
+  const from = s.v;
+  const ms = COVER_MS * Math.abs(to - from);
+  const aim = { to, done };
+  s.aim = aim;
+  draw(from); // right away, before the browser paints, so nothing flashes
+
+  // The clock starts on the first real frame, so a slow first frame can't skip ahead
+  let start = 0;
+  const tick = (now: number) => {
+    if (!start) start = now;
+    const t = ms ? Math.min((now - start) / ms, 1) : 1;
+    s.v = t < 1 ? from + (to - from) * curve(t) : to;
+    draw(s.v);
+    if (t < 1) {
+      s.raf = requestAnimationFrame(tick);
+      return;
+    }
+    s.aim = null;
+    aim.done(); // read at the end: it can be swapped while running
+  };
+  s.raf = requestAnimationFrame(tick);
+}

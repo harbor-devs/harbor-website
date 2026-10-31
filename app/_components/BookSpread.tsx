@@ -38,10 +38,10 @@ export default function BookSpread({
       <main className={styles.book}>
         {/* Right half's shadow on the desk. The left half's shadow belongs to
             the cover (CoverLeaf), since it lands there with the cover. */}
-        <div aria-hidden="true" className={styles.shadowRight} />
-        <div aria-hidden="true" className={styles.board} />
-        <div aria-hidden="true" className={styles.stackLeft} />
-        <div aria-hidden="true" className={styles.stackRight} />
+            <div aria-hidden="true" data-part="shadow-right" className={styles.shadowRight} />
+        <div aria-hidden="true" data-part="board" className={styles.board} />
+        <div aria-hidden="true" data-part="stack-left" className={styles.stackLeft} />
+        <div aria-hidden="true" data-part="stack-right" className={styles.stackRight} />
 
         <div className={styles.pages} inert={closed || backClosed}>
           {children}
