@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
+import { useRef, type PointerEvent } from "react";
 import { BackCoverBar } from "./BookNav";
 import { PhoneHeader } from "./PhoneNav";
+import { grabCover, type CoverGrab } from "./PhoneCoverLeaf";
 import cover from "./Cover.module.css";
 import phone from "./PhoneBook.module.css";
 import styles from "./PhoneBackCover.module.css";
@@ -51,19 +55,55 @@ export function BackBoard({ bare = false, gift = true, still = false }: BackBoar
   );
 }
 
+type PhoneBackCoverProps = {
+  onGrab?: (grab: CoverGrab) => void; // a finger started swiping the back cover open
+};
+
 // Phone: the closed diary seen from the back, at /the-end.
 // Uses the phone diary's own layout (like Cover), so it's the same size as the
 // last page and the swinging back cover lands exactly on it.
 // The note inks in, then the pressed flower lands.
+// Swiping it right swings it open by hand (the mirror of the front cover).
 // Under it: back to the last chapter, or read again.
-export default function PhoneBackCover() {
+export default function PhoneBackCover({ onGrab }: PhoneBackCoverProps) {
+  // Where the finger went down, until we know if it's a tap or a swipe
+  const down = useRef<{ id: number; x: number; y: number } | null>(null);
+
+  function onPointerDown(e: PointerEvent) {
+    if (!onGrab || (e.pointerType === "mouse" && e.button !== 0)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    down.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  }
+
+  function onPointerMove(e: PointerEvent) {
+    const d = down.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (Math.hypot(dx, dy) < 8) return; // still a tap
+    down.current = null;
+    // Mostly sideways and to the right: grab the back cover. Anything else: let it be.
+    if (dx > 0 && Math.abs(dx) > Math.abs(dy)) onGrab?.(grabCover(e.nativeEvent, d.x));
+  }
+
+  const forget = () => {
+    down.current = null;
+  };
+
   return (
     <div className={phone.stage}>
       <header className={phone.header}>
         <PhoneHeader />
       </header>
 
-      <main className={`${phone.page} ${cover.centered}`}>
+      <main
+        className={`${phone.page} ${cover.centered}`}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={forget}
+        onPointerCancel={forget}
+        onDragStart={(e) => e.preventDefault()} // a mouse drag shouldn't pick up a link
+      >
         {/* Mirrored, so the spine is on the right */}
         <div className={styles.flip}>
           <BackBoard />

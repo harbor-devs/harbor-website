@@ -97,8 +97,10 @@ export default function Book({ content }: BookProps) {
   const [phoneSettledOpen, setPhoneSettledOpen] = useState(!closed);
   // Where the phone back cover last finished swinging: true = shut, false = open
   const [phoneBackSettledShut, setPhoneBackSettledShut] = useState(backClosed);
-  // A finger swinging the phone cover by hand, open or shut (until it lands)
+  // A finger swinging the phone front cover by hand, open or shut (until it lands)
   const [grab, setGrab] = useState<CoverGrab | null>(null);
+  // Same, for the phone back cover
+  const [backGrab, setBackGrab] = useState<CoverGrab | null>(null);
 
   // From the back cover straight to the front cover ("Read again"):
   // no diary in between, so both covers just rest, no swing.
@@ -130,8 +132,10 @@ export default function Book({ content }: BookProps) {
   const phoneIndex = !phoneBackDone ? LAST : closed ? 0 : phoneCoverDone ? index : 0;
   // Fully open on a chapter: neither cover in the way or moving
   const phoneOpen = phoneCoverDone && phoneBackDone;
-  // Resting open on the first chapter: a right swipe there pulls the cover shut
-  const canGrabShut = phoneOpen && !grab && index === 0;
+  // Resting open on the first chapter: a right swipe there pulls the front cover shut
+  const canGrabShut = phoneOpen && !grab && !backGrab && index === 0;
+  // Resting open on the last chapter: a left swipe there pulls the back cover shut
+  const canGrabBack = phoneOpen && !grab && !backGrab && index === LAST;
 
   // Where "next" and "previous" go from here.
   // Front shut: next opens. First chapter: previous closes the front.
@@ -274,13 +278,13 @@ export default function Book({ content }: BookProps) {
         </BookSpread>
       </div>
 
-            {/* Below 900px: the resting front cover, the resting back cover, or the
+      {/* Below 900px: the resting front cover, the resting back cover, or the
           phone diary that curls page to page (with a cover swinging on top of it
           while it opens, closes, or a finger holds it). The diary only mounts
           on phone width, so the laptop never holds a WebGL canvas for it. */}
       <div className="flex flex-1 flex-col book:hidden">
-        {phoneBackShutDone ? (
-          <PhoneBackCover />
+        {phoneBackShutDone && !backGrab ? (
+          <PhoneBackCover onGrab={setBackGrab} />
         ) : phoneShutDone && !grab ? (
           <Cover onGrab={setGrab} />
         ) : (
@@ -291,8 +295,9 @@ export default function Book({ content }: BookProps) {
               onUserTurn={(i) => router.push(CHAPTERS[i].href, { scroll: false })}
               onArrive={setPhoneAt}
               header={<PhoneHeader current={phoneOpen ? chapter.slug : undefined} />}
-              footer={phoneOpen && !grab ? <PhoneTurnBar nav={nav} /> : null}
+              footer={phoneOpen && !grab && !backGrab ? <PhoneTurnBar nav={nav} /> : null}
               onGrabCover={canGrabShut ? (e, startX) => setGrab(grabCover(e, startX, true)) : null}
+              onGrabBack={canGrabBack ? (e, startX) => setBackGrab(grabCover(e, startX, true)) : null}
               cover={
                 !phoneCoverDone || grab
                   ? {
@@ -308,18 +313,28 @@ export default function Book({ content }: BookProps) {
                         router.push(o ? CHAPTERS[0].href : COVER_HREF, { scroll: false });
                       },
                     }
-                  : !phoneBackDone
+                  : !phoneBackDone || backGrab
                     ? {
                         side: "back",
                         // "open" means the book is open, so the back cover is off the page
                         open: !phoneBackShut,
-                        onSettle: (o) => setPhoneBackSettledShut(!o),
+                        grab: backGrab,
+                        // Landed (open or shut): the hand is done
+                        onSettle: (o) => {
+                          setPhoneBackSettledShut(!o);
+                          setBackGrab(null);
+                        },
+                        // Let go past halfway: the URL catches up while it finishes
+                        onLetGo: (o) => {
+                          router.push(o ? CHAPTERS[LAST].href : BACK_COVER_HREF, { scroll: false });
+                        },
                       }
                     : null
               }
             />
           )
         )}
-      </div>'</>
+      </div>
+    </>
   );
 }

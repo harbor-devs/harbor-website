@@ -28,6 +28,9 @@ type PhoneBookProps = {
   // First page, swiping right: the finger grabs the front cover to close it.
   // Null when closing isn't allowed right now.
   onGrabCover?: ((e: PointerEvent, startX: number) => void) | null;
+    // Last page, swiping left: the finger grabs the back cover to close it.
+  // Null when closing isn't allowed right now.
+  onGrabBack?: ((e: PointerEvent, startX: number) => void) | null;
 };
 
 const BOTTOM: Point = { x: PAGE_W, y: PAGE_H };
@@ -88,6 +91,7 @@ export default function PhoneBook({
   footer,
   cover,
   onGrabCover,
+  onGrabBack,
 }: PhoneBookProps) {
   const pageRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -110,7 +114,12 @@ export default function PhoneBook({
     onGrabCover(e, startX);
     return true;
   });
-
+  // Same for the back cover
+  const grabBack = useEffectEvent((e: PointerEvent, startX: number) => {
+    if (!onGrabBack) return false;
+    onGrabBack(e, startX);
+    return true;
+  });
   useEffect(() => {
     const page = pageRef.current;
     const box = boxRef.current;
@@ -383,6 +392,8 @@ export default function PhoneBook({
           // First page, swiping right: no page to turn back, so the front cover
           // comes over instead (it follows the finger from here, on window)
           if (dir < 0 && shown === 0 && getTarget() === 0 && grabFront(e, d.sx)) suppressClick = true;
+                    // Last page, swiping left: the back cover comes over instead
+          if (dir > 0 && shown === last && getTarget() === last && grabBack(e, d.sx)) suppressClick = true;
           return;
         }
         d.dir = dir;
