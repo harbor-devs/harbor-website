@@ -1,14 +1,24 @@
 "use client";
 
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, type ReactNode } from "react";
-import { easeOut, ramp, runSwing, type Swing } from "../_lib/coverSwing";
+import {
+  FLICK,
+  clearStyles,
+  easeOut,
+  edgeToSwing,
+  findSpread,
+  part,
+  ramp,
+  runSwing,
+  setStyle,
+  type SpreadParts,
+  type Swing,
+} from "../_lib/coverSwing";
 import { useSwipe } from "../_lib/useSwipe";
 import ClosedBook from "./ClosedBook";
 import flip from "./FlipBook.module.css";
 import type { CoverGrab } from "./PhoneCoverLeaf";
 import styles from "./CoverLeaf.module.css";
-
-const FLICK = 0.4; // px per ms: a quick drag counts even if it's short
 
 type CoverLeafProps = {
   open: boolean; // swung open (or swinging open)
@@ -23,12 +33,7 @@ type CoverLeafProps = {
 };
 
 // Everything that moves while the cover swings
-type Parts = {
-  book: HTMLElement; // the whole book: slides to the middle and shrinks a little when shut
-  board: HTMLElement;
-  shadowRight: HTMLElement;
-  stackLeft: HTMLElement;
-  stackRight: HTMLElement;
+type Parts = SpreadParts & {
   base: HTMLElement;
   ground: HTMLElement;
   cast: HTMLElement;
@@ -38,36 +43,26 @@ type Parts = {
   shades: HTMLElement[];
 };
 
-// Finds the moving parts. This cover's own parts are inside the slot.
-// The book's parts live in BookSpread (the slot's parent), marked with data-part.
 function findParts(slot: HTMLElement | null): Parts | null {
-  const book = slot?.parentElement;
-  if (!slot || !book) return null;
-  const mine = (name: string) => slot.querySelector<HTMLElement>(`[data-part="${name}"]`);
-  const spread = (name: string) => book.querySelector<HTMLElement>(`:scope > [data-part="${name}"]`);
-  const x = {
-    book,
-    board: spread("board"),
-    shadowRight: spread("shadow-right"),
-    stackLeft: spread("stack-left"),
-    stackRight: spread("stack-right"),
-    base: mine("base"),
-    ground: mine("ground"),
-    cast: mine("cast"),
-    leaf: mine("leaf"),
-    front: mine("front"),
-    back: mine("back"),
+  const spread = findSpread(slot);
+  if (!slot || !spread) return null;
+  const own = {
+    base: part(slot, "base"),
+    ground: part(slot, "ground"),
+    cast: part(slot, "cast"),
+    leaf: part(slot, "leaf"),
+    front: part(slot, "front"),
+    back: part(slot, "back"),
   };
-  if (Object.values(x).some((el) => !el)) return null;
+  if (Object.values(own).some((el) => !el)) return null;
   const shades = [...slot.querySelectorAll<HTMLElement>('[data-part="shade"]')];
-  return { ...(x as Omit<Parts, "shades">), shades };
+  return { ...spread, ...(own as Omit<Parts, keyof SpreadParts | "shades">), shades };
 }
 
-// Written straight on the element, with its CSS transition off so it can't lag behind
-function set(el: HTMLElement, prop: string, value: string | number) {
-  el.style.setProperty("transition", "none");
-  el.style.setProperty(prop, String(value));
-}
+const all = (x: Parts) => [
+  x.book, x.board, x.shadowRight, x.stackLeft, x.stackRight,
+  x.base, x.ground, x.cast, x.leaf, x.front, x.back, ...x.shades,
+];
 
 // Puts everything where it belongs for swing amount v (0 = shut, 1 = open).
 // At 0 and 1 every value matches the CSS resting state, so handing back to CSS can't be seen.
@@ -75,34 +70,23 @@ function draw(x: Parts, v: number) {
   // The open book's own edges and shadow: there as soon as the cover lifts
   const lifted = ramp(0, 0.1, v);
 
-  set(x.book, "transform", v === 1 ? "none" : `scale(${0.85 + 0.15 * v}) translateX(${-25 * (1 - v)}%)`);
-  set(x.board, "opacity", lifted);
-  set(x.board, "clip-path", v < 1 ? "inset(0 0 0 50%)" : "inset(0)"); // left half only once it has landed
-  set(x.shadowRight, "opacity", lifted);
-  set(x.stackRight, "opacity", lifted);
-  set(x.stackLeft, "opacity", v < 1 ? 0 : 1);
+  setStyle(x.book, "transform", v === 1 ? "none" : `scale(${0.85 + 0.15 * v}) translateX(${-25 * (1 - v)}%)`);
+  setStyle(x.board, "opacity", lifted);
+  setStyle(x.board, "clip-path", v < 1 ? "inset(0 0 0 50%)" : "inset(0)"); // left half only once it has landed
+  setStyle(x.shadowRight, "opacity", lifted);
+  setStyle(x.stackRight, "opacity", lifted);
+  setStyle(x.stackLeft, "opacity", v < 1 ? 0 : 1);
 
-  set(x.base, "opacity", 1 - lifted);
-  set(x.ground, "opacity", ramp(0.65, 1, v)); // its shadow arrives as it comes down on the left
-  set(x.cast, "opacity", v > 0 ? 1 - ramp(0, 0.25, v) : 0); // on the right page while it's just above it
+  setStyle(x.base, "opacity", 1 - lifted);
+  setStyle(x.ground, "opacity", ramp(0.65, 1, v)); // its shadow arrives as it comes down on the left
+  setStyle(x.cast, "opacity", v > 0 ? 1 - ramp(0, 0.25, v) : 0); // on the right page while it's just above it
 
-  set(x.leaf, "transform", v === 0 ? "none" : `rotateY(${-180 * v}deg)`);
+  setStyle(x.leaf, "transform", v === 0 ? "none" : `rotateY(${-180 * v}deg)`);
   // The outside until it's edge-on, then the inside
-  set(x.front, "opacity", v <= 0.5 ? 1 : 0);
-  set(x.back, "opacity", v <= 0.5 ? 0 : 1);
+  setStyle(x.front, "opacity", v <= 0.5 ? 1 : 0);
+  setStyle(x.back, "opacity", v <= 0.5 ? 0 : 1);
   // Darkest when edge-on
-  x.shades.forEach((el) => set(el, "opacity", 1 - Math.abs(2 * v - 1)));
-}
-
-// Resting: hand everything back to the CSS
-function clear(x: Parts) {
-  const all = [
-    x.book, x.board, x.shadowRight, x.stackLeft, x.stackRight,
-    x.base, x.ground, x.cast, x.leaf, x.front, x.back, ...x.shades,
-  ];
-  for (const el of all) {
-    for (const prop of ["transition", "transform", "opacity", "clip-path"]) el.style.removeProperty(prop);
-  }
+  x.shades.forEach((el) => setStyle(el, "opacity", 1 - Math.abs(2 * v - 1)));
 }
 
 // The front cover of the laptop book. It hinges on the spine (its left edge)
@@ -125,7 +109,7 @@ export default function CoverLeaf({
   onLetGo,
 }: CoverLeafProps) {
   const slotRef = useRef<HTMLDivElement>(null);
-  // Where the cover is, and the swing that's running
+  // Where the cover is (0 = shut, 1 = open), and the swing that's running
   const swing = useRef<Swing>({ v: open ? 1 : 0, raf: 0, aim: null });
   // The mouse is holding it
   const held = useRef(false);
@@ -148,12 +132,11 @@ export default function CoverLeaf({
     const x = findParts(slotRef.current);
     if (!x) return;
     const finish = () => {
-      clear(x);
+      clearStyles(all(x));
       settle(open);
     };
 
-    if (instant || (!s.aim && s.v === to)) {
-      // Nothing to show, or it already got there while the URL caught up
+    if (instant) {
       cancelAnimationFrame(s.raf);
       s.aim = null;
       s.v = to;
@@ -161,7 +144,7 @@ export default function CoverLeaf({
     } else if (s.aim?.to === to) {
       s.aim.done = finish; // already on its way there: just finish the job
     } else {
-      runSwing(s, to, (v) => draw(x, v), finish);
+      runSwing(s, to, (v) => draw(x, v), finish); // (zero length if it already got there)
     }
   }, [open, instant]);
 
@@ -184,15 +167,15 @@ export default function CoverLeaf({
     const closing = grab.closing;
     const sx = grab.startX;
     const reach = Math.max(Math.abs(spine - sx), r.width / 4); // grab point to spine
-    const draw_ = (v: number) => draw(x, v);
+    const drawAt = (v: number) => draw(x, v);
 
     const update = () => {
       if (!held.current) return;
       if (!grab.up) {
-        // k = where the free edge is, from -1 (open, flat on the left) to 1 (shut)
-        const k = closing ? -1 + (grab.x - sx) / reach : 1 - (sx - grab.x) / reach;
-        s.v = Math.acos(Math.min(Math.max(k, -1), 1)) / Math.PI;
-        draw(x, s.v);
+        // The free edge, from 1 (shut, flat on the right) to -1 (open, flat on the left)
+        const edge = closing ? -1 + (grab.x - sx) / reach : 1 - (sx - grab.x) / reach;
+        s.v = edgeToSwing(edge);
+        drawAt(s.v);
         return;
       }
       held.current = false;
@@ -203,14 +186,20 @@ export default function CoverLeaf({
       if (toOpen !== closing) {
         // Changing sides: the URL catches up, then it lands (the swing effect above)
         waiting.current = true;
-        runSwing(s, toOpen ? 1 : 0, draw_, () => {}, easeOut);
+        runSwing(s, toOpen ? 1 : 0, drawAt, () => {}, easeOut);
         letGo(toOpen);
       } else {
         // Falling back where it started: the URL is already right
-        runSwing(s, toOpen ? 1 : 0, draw_, () => {
-          clear(x);
-          settle(toOpen);
-        }, easeOut);
+        runSwing(
+          s,
+          toOpen ? 1 : 0,
+          drawAt,
+          () => {
+            clearStyles(all(x));
+            settle(toOpen);
+          },
+          easeOut,
+        );
       }
     };
 

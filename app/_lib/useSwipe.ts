@@ -53,3 +53,33 @@ export function useSwipe(
     },
   };
 }
+type Swipe = ReturnType<typeof useSwipe>;
+
+// Two swipes on one element (the left page and the right page), both listening
+export function bothSwipes(a: Swipe, b: Swipe): Swipe {
+  return {
+    onPointerDown(e) {
+      a.onPointerDown(e);
+      b.onPointerDown(e);
+    },
+    onPointerMove(e) {
+      a.onPointerMove(e);
+      b.onPointerMove(e);
+    },
+    onPointerUp() {
+      a.onPointerUp();
+      b.onPointerUp();
+    },
+    onPointerCancel() {
+      a.onPointerCancel();
+      b.onPointerCancel();
+    },
+    onClickCapture(e) {
+      a.onClickCapture(e);
+      b.onClickCapture(e);
+    },
+    onDragStart(e) {
+      e.preventDefault();
+    },
+  };
+}

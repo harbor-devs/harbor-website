@@ -1,7 +1,7 @@
 "use client";
 
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
-import { useSwipe } from "../_lib/useSwipe";
+import { bothSwipes, useSwipe } from "../_lib/useSwipe";
 import styles from "./BookSpread.module.css";
 
 type BookSpreadProps = {
@@ -15,13 +15,16 @@ type BookSpreadProps = {
   clipLeft?: boolean; // hide the left page (the front cover is covering it, or swinging)
   clipRight?: boolean; // hide the right half (the back cover is covering it, or swinging)
   onGrabPages?: ((e: PointerEvent, startX: number) => void) | null; // left page dragged right: the mouse pulls the front cover shut
+  onGrabBack?: ((e: PointerEvent, startX: number) => void) | null; // right page dragged left: the mouse pulls the back cover shut
 };
 
-// Only the left page counts: that's where the front cover comes back from
-const onLeftPage = (e: ReactPointerEvent<HTMLElement>) => {
+// Which page the press started on
+const half = (e: ReactPointerEvent<HTMLElement>) => {
   const r = e.currentTarget.getBoundingClientRect();
-  return e.clientX < r.left + r.width / 2;
+  return e.clientX < r.left + r.width / 2 ? "left" : "right";
 };
+const onLeftPage = (e: ReactPointerEvent<HTMLElement>) => half(e) === "left";
+const onRightPage = (e: ReactPointerEvent<HTMLElement>) => half(e) === "right";
 
 // The open book on laptop: shadow, board, page stack edges, then the pages on top.
 // Decoration is aria-hidden so screen readers only hear the content.
@@ -36,8 +39,10 @@ export default function BookSpread({
   clipLeft,
   clipRight,
   onGrabPages = null,
+  onGrabBack = null,
 }: BookSpreadProps) {
-  const swipe = useSwipe(1, onGrabPages, onLeftPage);
+  // Left page dragged right closes the front cover, right page dragged left closes the back
+  const swipe = bothSwipes(useSwipe(1, onGrabPages, onLeftPage), useSwipe(-1, onGrabBack, onRightPage));
 
   return (
     <div
