@@ -38,6 +38,8 @@ export function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
 
 // --ease-turn in globals.css
 export const easeTurn = cubicBezier(0.65, 0, 0.35, 1);
+// Fast start, soft landing (after the mouse lets go, it's already moving)
+export const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 // 0 before a, 1 after b, a straight line in between
 export const ramp = (a: number, b: number, x: number) => Math.min(Math.max((x - a) / (b - a), 0), 1);

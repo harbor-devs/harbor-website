@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, type ReactNode } from "react";
-import { ramp, runSwing, type Swing } from "../_lib/coverSwing";
+import { easeOut, ramp, runSwing, type Swing } from "../_lib/coverSwing";
+import { useSwipe } from "../_lib/useSwipe";
 import ClosedBook from "./ClosedBook";
 import flip from "./FlipBook.module.css";
+import type { CoverGrab } from "./PhoneCoverLeaf";
 import styles from "./CoverLeaf.module.css";
+
+const FLICK = 0.4; // px per ms: a quick drag counts even if it's short
 
 type CoverLeafProps = {
   open: boolean; // swung open (or swinging open)
@@ -13,6 +17,9 @@ type CoverLeafProps = {
   instant: boolean; // no swing to show (reduced motion, or phone width): jump straight there
   inside: ReactNode; // what's printed on the inside: the first chapter's left page
   onSettle: (open: boolean) => void; // the swing finished
+  grab?: CoverGrab | null; // the mouse is swinging it by hand (until it lands)
+  onGrab?: ((e: PointerEvent, startX: number) => void) | null; // the mouse started dragging the shut cover left
+  onLetGo?: (open: boolean) => void; // let go and it's changing sides: true = going open, false = going shut
 };
 
 // Everything that moves while the cover swings
@@ -106,18 +113,38 @@ function clear(x: Parts) {
 // (board, page stack edges, first left page), so when it lands, the swap to
 // the real book can't be seen.
 // The CSS holds the two resting states. While it swings, JavaScript moves it.
-export default function CoverLeaf({ open, done, hideGround = false, instant, inside, onSettle }: CoverLeafProps) {
+export default function CoverLeaf({
+  open,
+  done,
+  hideGround = false,
+  instant,
+  inside,
+  onSettle,
+  grab = null,
+  onGrab = null,
+  onLetGo,
+}: CoverLeafProps) {
   const slotRef = useRef<HTMLDivElement>(null);
   // Where the cover is, and the swing that's running
   const swing = useRef<Swing>({ v: open ? 1 : 0, raf: 0, aim: null });
+  // The mouse is holding it
+  const held = useRef(false);
+  // Let go on the other side: it can only settle once the URL catches up
+  const waiting = useRef(false);
   const settle = useEffectEvent((o: boolean) => onSettle(o));
+  const letGo = useEffectEvent((o: boolean) => onLetGo?.(o));
+  // Dragging the shut cover to the left hands it to the mouse
+  const swipe = useSwipe(-1, onGrab);
 
   // Swing toward "open". If it flips mid-swing, it turns back from where it is.
   // Runs before the browser paints, so the new CSS resting state never shows early.
   useLayoutEffect(() => {
+    if (held.current) return; // the mouse is in charge
     const s = swing.current;
     const to = open ? 1 : 0;
-    if (!s.aim && s.v === to) return; // already resting there (first load)
+    const waited = waiting.current;
+    waiting.current = false;
+    if (!s.aim && s.v === to && !waited) return; // already resting there (first load)
     const x = findParts(slotRef.current);
     if (!x) return;
     const finish = () => {
@@ -125,7 +152,8 @@ export default function CoverLeaf({ open, done, hideGround = false, instant, ins
       settle(open);
     };
 
-    if (instant) {
+    if (instant || (!s.aim && s.v === to)) {
+      // Nothing to show, or it already got there while the URL caught up
       cancelAnimationFrame(s.raf);
       s.aim = null;
       s.v = to;
@@ -136,6 +164,60 @@ export default function CoverLeaf({ open, done, hideGround = false, instant, ins
       runSwing(s, to, (v) => draw(x, v), finish);
     }
   }, [open, instant]);
+
+  // The mouse.
+  // Opening (grabbed on the shut cover): its free edge stays under the mouse,
+  // so at the spine it's standing straight up. Closing (grabbed on the first
+  // left page): the same, mirrored. Let go past halfway (or flick that way)
+  // and it finishes, otherwise it falls back.
+  useLayoutEffect(() => {
+    if (!grab) return;
+    const s = swing.current;
+    const x = findParts(slotRef.current);
+    if (!x) return;
+    cancelAnimationFrame(s.raf);
+    s.aim = null;
+    held.current = true;
+
+    const r = x.book.getBoundingClientRect();
+    const spine = r.left + r.width / 2;
+    const closing = grab.closing;
+    const sx = grab.startX;
+    const reach = Math.max(Math.abs(spine - sx), r.width / 4); // grab point to spine
+    const draw_ = (v: number) => draw(x, v);
+
+    const update = () => {
+      if (!held.current) return;
+      if (!grab.up) {
+        // k = where the free edge is, from -1 (open, flat on the left) to 1 (shut)
+        const k = closing ? -1 + (grab.x - sx) / reach : 1 - (sx - grab.x) / reach;
+        s.v = Math.acos(Math.min(Math.max(k, -1), 1)) / Math.PI;
+        draw(x, s.v);
+        return;
+      }
+      held.current = false;
+
+      // Where it ends up: a flick decides, otherwise past halfway or not.
+      // Cancelled: back where it started.
+      const toOpen = grab.cancelled ? closing : grab.vx < -FLICK ? true : grab.vx > FLICK ? false : s.v > 0.5;
+      if (toOpen !== closing) {
+        // Changing sides: the URL catches up, then it lands (the swing effect above)
+        waiting.current = true;
+        runSwing(s, toOpen ? 1 : 0, draw_, () => {}, easeOut);
+        letGo(toOpen);
+      } else {
+        // Falling back where it started: the URL is already right
+        runSwing(s, toOpen ? 1 : 0, draw_, () => {
+          clear(x);
+          settle(toOpen);
+        }, easeOut);
+      }
+    };
+
+    grab.listen(update);
+    update(); // catch up: the mouse moved (or let go) before this ran
+    return () => grab.listen(null);
+  }, [grab]);
 
   // Leaving the screen mid-swing: stop the clock
   useEffect(() => {
@@ -162,7 +244,7 @@ export default function CoverLeaf({ open, done, hideGround = false, instant, ins
       {/* Shadow the lifting cover throws on the right page */}
       <div aria-hidden="true" data-part="cast" className={styles.cast} />
 
-      <div data-part="leaf" className={styles.leaf} inert={open}>
+      <div data-part="leaf" className={styles.leaf} inert={open} {...swipe}>
         {/* Outside: the locked cover design, board only */}
         <div data-part="front" className={styles.front}>
           <ClosedBook bare />

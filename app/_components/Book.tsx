@@ -68,15 +68,17 @@ export default function Book({ content }: BookProps) {
   const [settledOpen, setSettledOpen] = useState(!closed);
   // Where the back cover last finished swinging: true = shut, false = open
   const [backSettledShut, setBackSettledShut] = useState(backClosed);
+    // The mouse swinging the laptop front cover by hand, open or shut (until it lands)
+  const [drag, setDrag] = useState<CoverGrab | null>(null);
 
   // --- The front cover ---
   // Closing from a later chapter: pages riffle back to the first chapter first,
   // and the cover stays open until they get there.
   const coverOpen = !closed || flipAt !== 0;
   // Fully open and landed: the cover hides and the real pages take over
-  const coverDone = coverOpen && (instant || settledOpen);
+  const coverDone = coverOpen && (instant || settledOpen) && !drag;
   // Fully shut and resting
-  const shutDone = !coverOpen && (instant || !settledOpen);
+  const shutDone = !coverOpen && (instant || !settledOpen) && !drag;
 
   // --- The back cover ---
   // Only shuts once the front is open and the pages are on the last chapter
@@ -145,6 +147,10 @@ export default function Book({ content }: BookProps) {
 
   // The book is fully open on a chapter (neither cover in the way or moving)
   const open = coverDone && backDone;
+    // Laptop: the mouse can swing the front cover. Drag the shut cover left to
+  // open it, or drag the first left page right to close it.
+  const canDragOpen = !instant && shutDone && flipAt === 0;
+  const canDragShut = !instant && open && index === 0 && flipAt === 0;
 
   // The "scroll or use the arrow keys" hint: shown on the first chapter
   // until the visitor turns a page for the first time, then gone for good.
@@ -242,6 +248,7 @@ export default function Book({ content }: BookProps) {
           backClosed={backShut}
           clipLeft={!coverDone}
           clipRight={!backDone}
+                    onGrabPages={canDragShut ? (e, startX) => setDrag(grabCover(e, startX, true)) : null}
           header={
             <>
               {/* Logo top-left once the book is open, or resting on its back cover */}
@@ -251,13 +258,21 @@ export default function Book({ content }: BookProps) {
           }
           footer={footer}
           cover={
-            <CoverLeaf
+                <CoverLeaf
               open={coverOpen}
               done={coverDone}
               hideGround={backShut}
               instant={instant}
               inside={content[CHAPTERS[0].slug].left}
-              onSettle={setSettledOpen}
+              grab={drag}
+              onGrab={canDragOpen ? (e, startX) => setDrag(grabCover(e, startX)) : null}
+              // Landed (open or shut): the mouse is done
+              onSettle={(o) => {
+                setSettledOpen(o);
+                setDrag(null);
+              }}
+              // Let go past halfway: the URL catches up while it finishes
+              onLetGo={(o) => router.push(o ? CHAPTERS[0].href : COVER_HREF, { scroll: false })}
             />
           }
           back={
