@@ -64,7 +64,14 @@ export default function Board({ category, items }: { category: Category; items: 
             >
               <span className={s.nail} aria-hidden="true" />
               <p className={s.kicker}>CASE No. {String(i + 1).padStart(3, "0")}</p>
-              <h2 className={s.name}>{item.title}</h2>
+
+              {/* The title link stretches over the whole paper, so clicking anywhere opens it */}
+              <h2 className={s.name}>
+                <a className={s.cover} href={item.links[0].href} target="_blank" rel="noopener noreferrer">
+                  {item.title}
+                </a>
+              </h2>
+              <p className={s.kind}>{item.kind}</p>
 
               {item.image && (
                 <div className={s.photo}>
