@@ -61,6 +61,7 @@
 
 /* Cork inside the frame. Grows taller as papers are added. */
 .cork {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 56px 32px;
@@ -220,8 +221,13 @@
 
 /* ---------- Case papers ---------- */
 
-.paper {
+/* The slot holds one paper plus its clip or tape; it is what tilts and lifts */
+.slot {
   width: min(200px, 100%);
+}
+.paper {
+  position: relative;
+  width: 100%;
   padding: 26px 14px 16px;
   text-align: center;
 }
