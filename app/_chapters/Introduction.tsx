@@ -22,13 +22,11 @@ export const introduction = {
       </div>
 
       {/* Lines 9 to 13: the last five ruled lines */}
-      <div className={d.ruled} style={row(8)}>
+            <div className={d.ruled} style={row(8)}>
         <p>
-          I&apos;m a computer science student in Lahore. I build websites, apps and
-          small tools, and I&apos;m curious about AI, healthcare, research and how
-          people think.
+          Time forgets what is hurried and keeps what is made with care. I am a
+          student from Lahore, and I am trying to build the second kind.
         </p>
-        <p className={d.indent}>Harbor is where I build, publish and take on work.</p>
       </div>
 
       <p className={d.folio} aria-hidden="true">i</p>
@@ -43,9 +41,11 @@ export const introduction = {
 
       {/* Starts on the first ruled line: 3 lines of text, 1 empty, contents */}
       <div className={d.ruled} style={row(0)}>
-        <p>
-          Harbor is two things: the home for my work, and a place to hire me.
-          Here you&apos;ll find what I&apos;ve built and written, and the services I offer.
+             <p>
+          Before everything got fast, people wrote things down, because everything
+          that lasts began as a story. Every business is a story that forgot it was
+          one. If yours has a story, bring it, and I will build it a home worth
+          returning to.
         </p>
         <ChapterContents variant="book" />
       </div>
