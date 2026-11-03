@@ -11,10 +11,12 @@ export type Category = {
 
 export const CATEGORIES: readonly Category[] = [
   { slug: "software", title: "Software & Websites", numeral: "i" },
-  { slug: "games", title: "Games", numeral: "ii" },
-  { slug: "articles", title: "Articles", numeral: "iii" },
-  { slug: "research", title: "Research Papers", numeral: "iv" },
-  { slug: "certifications", title: "Certifications", numeral: "v" },
+  // Games is hidden for now (the game is a file, not playable in the browser yet).
+  // To bring it back: uncomment this line and renumber the ones below.
+  // { slug: "games", title: "Games", numeral: "ii" },
+  { slug: "articles", title: "Articles", numeral: "ii" },
+  { slug: "research", title: "Research Papers", numeral: "iii" },
+  { slug: "certifications", title: "Certifications", numeral: "iv" },
 ];
 
 // Where each category's board lives, e.g. /portfolio/software
