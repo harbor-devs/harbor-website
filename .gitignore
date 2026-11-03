@@ -50,3 +50,5 @@ desktop.ini
 
 # personal AI tool notes, never commit
 CLAUDE.local.md
+# Local Netlify folder
+.netlify
