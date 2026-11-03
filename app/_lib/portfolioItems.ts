@@ -2,7 +2,7 @@ import type { CategorySlug } from "./portfolio";
 
 // What each paper on a board shows. Case numbers come from the order here.
 
-export type Status = "live" | "prototype" | "in-progress";
+export type Status = "live" | "prototype" | "in-progress" | "published";
 
 export type CaseLink = { label: string; href: string };
 
@@ -67,7 +67,49 @@ export const ITEMS: Record<CategorySlug, PortfolioItem[]> = {
     },
   ],
   games: [],
-  articles: [],
+  articles: [
+    {
+      title: "Things We Inherited Without Choosing",
+      kind: "Essay on culture and habits",
+      line: "Everyday habits we never chose, like log kya kahenge (what will people say), and how they get passed down.",
+      status: "published",
+      links: [{ label: "Read", href: "/writing/things-we-inherited.pdf" }],
+    },
+    {
+      title: "How Modern Life Disrupts Our Sleep Chemistry",
+      kind: "Review article on sleep science",
+      line: "How screens, light and messy routines throw off the hormones that put us to sleep, and how to fix it.",
+      status: "published",
+      links: [{ label: "Read", href: "/writing/sleep-chemistry.pdf" }],
+    },
+    {
+      title: "The Healing Power of Positive People",
+      kind: "Article on mental health",
+      line: "Why kind, steady people around you can change how someone gets through depression and anxiety.",
+      status: "published",
+      links: [{ label: "Read", href: "/writing/positive-people.pdf" }],
+    },
+    {
+      title: "Tourism in Pakistan",
+      kind: "Blog on travel",
+      line: "Pakistan has views that rival Switzerland, so why do so many Pakistanis still holiday abroad?",
+      status: "published",
+      links: [{ label: "Read", href: "/writing/tourism-in-pakistan.pdf" }],
+    },
+    {
+      title: "Becoming Your Own Reason to Try Again",
+      kind: "Blog on motivation",
+      line: "Rest isn't laziness. How to start again without the guilt.",
+      status: "published",
+      links: [{ label: "Read", href: "/writing/your-own-reason-to-try-again.pdf" }],
+    },
+  ],
   research: [],
   certifications: [],
+};
+
+// A typed "coming next" scrap at the end of a board. Only real plans, never shown as finished work.
+export const UPCOMING: Partial<Record<CategorySlug, string>> = {
+  articles:
+    "Coming next: research papers on Lahore's smog and the real energy and water cost of AI, plus articles on how we're handing our thinking over to AI and the business of being sick.",
 };

@@ -15,8 +15,9 @@ export const CATEGORIES: readonly Category[] = [
   // To bring it back: uncomment this line and renumber the ones below.
   // { slug: "games", title: "Games", numeral: "ii" },
   { slug: "articles", title: "Articles", numeral: "ii" },
-  { slug: "research", title: "Research Papers", numeral: "iii" },
-  { slug: "certifications", title: "Certifications", numeral: "iv" },
+  // Hidden until filled. Uncomment and renumber when they're ready.
+  // { slug: "research", title: "Research Papers", numeral: "iii" },
+  // { slug: "certifications", title: "Certifications", numeral: "iv" },
 ];
 
 // Where each category's board lives, e.g. /portfolio/software

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { boardFonts } from "../_lib/boardFonts";
 import type { Category } from "../_lib/portfolio";
-import type { PortfolioItem, Status } from "../_lib/portfolioItems";
+import { UPCOMING, type PortfolioItem, type Status } from "../_lib/portfolioItems";
 import { MarkerCircle, MarkerInk, PaperClip, StartHere, Tape, UnderSheet } from "./BoardProps";
 import d from "./BoardProps.module.css";
 import s from "./Board.module.css";
@@ -22,6 +22,7 @@ const STAMP: Record<Status, { label: string; className: string }> = {
   live: { label: "LIVE", className: s.live },
   prototype: { label: "PROTOTYPE", className: s.proto },
   "in-progress": { label: "IN PROGRESS", className: s.progress },
+    published: { label: "PUBLISHED", className: s.live },
 };
 
 export default function Board({ category, items }: { category: Category; items: readonly PortfolioItem[] }) {
@@ -124,6 +125,13 @@ export default function Board({ category, items }: { category: Category; items: 
             <p className={`${s.aged} ${s.tornC} ${s.pin} ${s.scrap}`} style={pinned(1)}>
               <span className={s.nail} aria-hidden="true" />
               Nothing is pinned here yet.
+            </p>
+          )}
+          
+          {UPCOMING[category.slug] && (
+            <p className={`${s.aged} ${s.tornC} ${s.pin} ${s.scrap}`} style={pinned(items.length + 1)}>
+              <span className={s.nail} aria-hidden="true" />
+              {UPCOMING[category.slug]}
             </p>
           )}
         </div>

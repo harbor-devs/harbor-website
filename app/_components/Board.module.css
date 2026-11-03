@@ -340,12 +340,13 @@
 
 /* Shown only when a category has no papers yet */
 .scrap {
-  width: min(200px, 100%);
+  width: min(220px, 100%);
   margin: 0;
   padding: 22px 16px 16px;
-  font-family: var(--font-hand), cursive;
-  font-size: 13px;
-  line-height: 1.7;
+  font-family: var(--font-garamond), Georgia, serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
   color: #3a2410;
 }
 
