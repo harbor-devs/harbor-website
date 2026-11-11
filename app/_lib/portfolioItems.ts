@@ -30,6 +30,17 @@ export const ITEMS: Record<CategorySlug, PortfolioItem[]> = {
       ],
     },
     {
+      title: "VERDICT",
+      kind: "Personal finance app",
+      line: "Tracks your money and gives you an honest verdict before you spend it.",
+      status: "live",
+      madeWith: "React, Express, PostgreSQL",
+      links: [
+        { label: "Visit", href: "https://verdict-finance.netlify.app" },
+        { label: "Source", href: "https://github.com/harbor-devs/verdict" },
+      ],
+    },
+    {
       title: "MediTrace",
       kind: "Medical record keeping app",
       line: "Keeps a patient's medical history in one place they control, ready to share with a doctor.",
@@ -43,13 +54,6 @@ export const ITEMS: Record<CategorySlug, PortfolioItem[]> = {
       line: "See how long the wait is and join the line from your phone, instead of standing in it.",
       status: "prototype",
       links: [{ label: "Visit", href: "https://queueless-queue-management.netlify.app" }],
-    },
-    {
-      title: "VERDICT",
-      kind: "Personal finance app",
-      line: "Tracks your money and gives you an honest opinion before you spend it.",
-      status: "prototype",
-      links: [{ label: "Visit", href: "https://verdict-finance-app.netlify.app" }],
     },
     {
       title: "KLINAVO",
@@ -69,39 +73,32 @@ export const ITEMS: Record<CategorySlug, PortfolioItem[]> = {
   games: [],
   articles: [
     {
-      title: "Things We Inherited Without Choosing",
+      title: "Things We Inherited and Never Questioned",
       kind: "Essay on culture and habits",
       line: "Everyday habits we never chose, like log kya kahenge (what will people say), and how they get passed down.",
       status: "published",
       links: [{ label: "Read", href: "/writing/things-we-inherited.pdf" }],
     },
     {
-      title: "How Modern Life Disrupts Our Sleep Chemistry",
-      kind: "Review article on sleep science",
-      line: "How screens, light and messy routines throw off the hormones that put us to sleep, and how to fix it.",
+      title: "We're Not Being Taken Over, We're Handing It Over",
+      kind: "Article on AI and how we think",
+      line: "Nobody is forcing us to hand our thinking to AI. We are doing it ourselves, one small question at a time.",
       status: "published",
-      links: [{ label: "Read", href: "/writing/sleep-chemistry.pdf" }],
+      links: [{ label: "Read", href: "/writing/handing-it-over.pdf" }],
     },
     {
-      title: "The Healing Power of Positive People",
-      kind: "Article on mental health",
-      line: "Why kind, steady people around you can change how someone gets through depression and anxiety.",
+      title: "The Illusion of Digital Consent",
+      kind: "Article on privacy",
+      line: "We click \"I agree\" without reading, and in Pakistan a lot of our data is public before anyone even asks.",
       status: "published",
-      links: [{ label: "Read", href: "/writing/positive-people.pdf" }],
+      links: [{ label: "Read", href: "/writing/digital-consent.pdf" }],
     },
     {
-      title: "Tourism in Pakistan",
-      kind: "Blog on travel",
-      line: "Pakistan has views that rival Switzerland, so why do so many Pakistanis still holiday abroad?",
+      title: "Connected but Lonelier",
+      kind: "Article on loneliness",
+      line: "We have more ways to reach people than any generation before us, and yet more of us feel lonely.",
       status: "published",
-      links: [{ label: "Read", href: "/writing/tourism-in-pakistan.pdf" }],
-    },
-    {
-      title: "Becoming Your Own Reason to Try Again",
-      kind: "Blog on motivation",
-      line: "Rest isn't laziness. How to start again without the guilt.",
-      status: "published",
-      links: [{ label: "Read", href: "/writing/your-own-reason-to-try-again.pdf" }],
+      links: [{ label: "Read", href: "/writing/connected-but-lonelier.pdf" }],
     },
   ],
   research: [],
@@ -111,5 +108,5 @@ export const ITEMS: Record<CategorySlug, PortfolioItem[]> = {
 // A typed "coming next" scrap at the end of a board. Only real plans, never shown as finished work.
 export const UPCOMING: Partial<Record<CategorySlug, string>> = {
   articles:
-    "Coming next: research papers on Lahore's smog and the real energy and water cost of AI, plus articles on how we're handing our thinking over to AI and the business of being sick.",
+    "Coming next: research papers on Lahore's smog and the real energy and water cost of AI, plus more articles, starting with the business of being sick.",
 };

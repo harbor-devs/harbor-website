@@ -4,7 +4,11 @@ import Board from "../../_components/Board";
 import { CATEGORIES } from "../../_lib/portfolio";
 import { ITEMS } from "../../_lib/portfolioItems";
 
-// Builds the 5 category boards ahead of time
+// The whole board depends on the category in the URL, so there is no shared
+// shell to prefetch. The boards are still built ahead of time below.
+export const instant = false;
+
+// Builds the category boards ahead of time
 export function generateStaticParams() {
   return CATEGORIES.map((c) => ({ category: c.slug }));
 }
