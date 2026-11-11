@@ -11,10 +11,9 @@ import styles from "./PhoneBook.module.css";
 const PAPER: Record<ChapterSlug, string> = {
   introduction: "/textures/page-phone-intro.webp",
   portfolio: "/textures/page-phone-portfolio.webp",
-  services: "/textures/page-phone-services.webp",
   now: "/textures/page-phone-now.webp",
+  services: "/textures/page-phone-services.webp",
   sketchbook: "/textures/page-phone-sketchbook.webp",
-  contact: "/textures/page-phone-contact.webp",
 };
 
 type PhoneBookProps = {

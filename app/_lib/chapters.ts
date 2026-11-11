@@ -1,14 +1,13 @@
 // The diary's chapters, in reading order.
-// Every navigation (top nav, bottom bar, phone menu, prev/next) reads from here,
+// Every navigation (top nav, bottom bar, phone menu, prev/next, contents list) reads from here,
 // so changing the order or a title only happens in this one file.
 
 export type ChapterSlug =
   | "introduction"
   | "portfolio"
-  | "services"
   | "now"
-  | "sketchbook"
-  | "contact";
+  | "services"
+  | "sketchbook";
 
 export type Chapter = {
   slug: ChapterSlug;
@@ -22,10 +21,9 @@ export type Chapter = {
 export const CHAPTERS: readonly Chapter[] = [
   { slug: "introduction", href: "/introduction", title: "Introduction", navLabel: "Home", shortLabel: "Intro", numeral: "i" },
   { slug: "portfolio", href: "/portfolio", title: "Portfolio", navLabel: "Portfolio", shortLabel: "Portfolio", numeral: "ii" },
-  { slug: "services", href: "/services", title: "Services", navLabel: "Services", shortLabel: "Services", numeral: "iii" },
-  { slug: "now", href: "/now", title: "Now", navLabel: "Now", shortLabel: "Now", numeral: "iv" },
+  { slug: "now", href: "/now", title: "Now", navLabel: "Now", shortLabel: "Now", numeral: "iii" },
+  { slug: "services", href: "/services", title: "Services", navLabel: "Services", shortLabel: "Services", numeral: "iv" },
   { slug: "sketchbook", href: "/sketchbook", title: "Sketchbook", navLabel: "Sketchbook", shortLabel: "Sketchbook", numeral: "v" },
-  { slug: "contact", href: "/contact", title: "Contact", navLabel: "Contact", shortLabel: "Contact", numeral: "vi" },
 ];
 
 // Before the first chapter: the closed front cover.
@@ -43,7 +41,7 @@ export function getChapterNav(slug: ChapterSlug) {
 
   return {
     chapter: CHAPTERS[index],
-    number: index + 1, // 1-based, for "2 of 6"
+    number: index + 1, // 1-based, for "2 of 5"
     total: CHAPTERS.length,
     prev: index > 0 ? CHAPTERS[index - 1] : null, // null = go to the cover
     next: index < CHAPTERS.length - 1 ? CHAPTERS[index + 1] : null, // null = close the book
