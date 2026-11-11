@@ -1,0 +1,137 @@
+/* Old calling card for the Services chapter. Numbers are canvas pixels (--u).
+   Paper textures (--noise, --stain, --fibers) come from CallingCard.tsx. */
+
+/* The card plus its corners. Tilt and shadow live here (paintSheet reads both). */
+.slot {
+  position: relative;
+  rotate: -1.8deg;
+  filter: drop-shadow(0 calc(3 * var(--u)) calc(4 * var(--u)) rgba(40, 22, 8, 0.4));
+}
+
+/* Laptop right page: centred, below the paragraph */
+.book {
+  position: absolute;
+  left: 50%;
+  top: calc(345 * var(--u));
+  width: calc(300 * var(--u));
+  margin-left: calc(-150 * var(--u));
+}
+
+/* Phone page: full width, under the italic line */
+.phone {
+  width: 100%;
+  margin-top: calc(22 * var(--u));
+}
+
+/* The aged card itself */
+.card {
+  padding: calc(22 * var(--u)) calc(24 * var(--u)) calc(20 * var(--u));
+  text-align: center;
+  color: #2a1a0e;
+  background-color: #e0cfa6;
+  background-image:
+    var(--stain),
+    var(--fibers),
+    var(--noise),
+    radial-gradient(ellipse at center, rgba(255, 240, 205, 0.18) 0, transparent 55%, rgba(70, 38, 10, 0.5) 100%);
+  background-size: 420px, 300px, 260px, auto;
+}
+
+/* Thin printed frame inside the card (laptop only) */
+.book .card {
+  outline: 1px solid #9c8358;
+  outline-offset: calc(-7 * var(--u));
+}
+
+.phone .card {
+  padding: calc(18 * var(--u)) calc(16 * var(--u)) calc(16 * var(--u));
+}
+
+/* Name in old printed small caps */
+.name {
+  margin: 0;
+  font-family: var(--font-fell-sc), serif;
+  font-weight: 400;
+  font-size: calc(24 * var(--u));
+  line-height: calc(28 * var(--u));
+  letter-spacing: 0.06em;
+}
+
+/* Short line under the name */
+.rule {
+  display: block;
+  width: calc(60 * var(--u));
+  margin: calc(8 * var(--u)) auto;
+  border-bottom: 1px solid #6b5233;
+}
+
+.what {
+  margin: 0 0 calc(12 * var(--u));
+  font-style: italic;
+  font-size: calc(15 * var(--u));
+  line-height: calc(20 * var(--u));
+}
+
+/* "HIRE ME ON UPWORK" in typewriter, madder red */
+.link {
+  display: inline-block;
+  padding-bottom: calc(2 * var(--u));
+  border-bottom: 1px solid currentColor;
+  font-family: var(--font-elite), monospace;
+  font-weight: 400;
+  font-size: calc(12.5 * var(--u));
+  line-height: calc(16 * var(--u));
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #7a1e14;
+}
+.link:hover {
+  color: #a3301f;
+}
+.link:focus-visible {
+  outline: 2px solid #7a1e14;
+  outline-offset: calc(3 * var(--u));
+}
+
+.phone .name {
+  font-size: calc(20 * var(--u));
+  line-height: calc(24 * var(--u));
+}
+.phone .what {
+  font-size: calc(13 * var(--u));
+  line-height: calc(17 * var(--u));
+}
+.phone .link {
+  font-size: calc(11 * var(--u));
+  line-height: calc(14 * var(--u));
+}
+
+/* Dark photo corners holding the card */
+.corner {
+  position: absolute;
+  z-index: 2;
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  background: #3a2a1a;
+}
+.tl {
+  top: calc(-6 * var(--u));
+  left: calc(-6 * var(--u));
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.tr {
+  top: calc(-6 * var(--u));
+  right: calc(-6 * var(--u));
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.bl {
+  bottom: calc(-6 * var(--u));
+  left: calc(-6 * var(--u));
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.br {
+  bottom: calc(-6 * var(--u));
+  right: calc(-6 * var(--u));
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}

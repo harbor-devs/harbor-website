@@ -4,6 +4,7 @@ import { introduction } from "../_chapters/Introduction";
 import { now } from "../_chapters/Now";
 import { portfolio } from "../_chapters/Portfolio";
 import { placeholder } from "../_chapters/Placeholder";
+import { services } from "../_chapters/Services";
 import type { ChapterSlug } from "../_lib/chapters";
 
 // Each chapter's content, by slug
@@ -11,7 +12,7 @@ const CONTENT: Record<ChapterSlug, ChapterContent> = {
   introduction,
   portfolio,
   now,
-  services: placeholder("services"),
+  services,
   sketchbook: placeholder("sketchbook"),
 };
 
