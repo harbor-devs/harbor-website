@@ -4,6 +4,8 @@
 // Draws each letter where the browser put it, so letter spacing and line breaks match.
 // No foreignObject trick: Safari blocks that for WebGL.
 
+import { FIBERS, NOISE, STAIN } from "./paperTextures";
+
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
 
 // Load an image once, then reuse it
@@ -35,6 +37,121 @@ function isSrOnly(el: Element): boolean {
   return false;
 }
 
+// A CSS angle like "-2.5deg" in radians (0 for "none")
+function radians(v: string): number {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? (n * Math.PI) / 180 : 0;
+}
+
+// A length from a clip-path ("12%" or "0px") in px of a box side
+function toPx(v: string, size: number): number {
+  return v.endsWith("%") ? (parseFloat(v) / 100) * size : parseFloat(v);
+}
+
+// Corner points of a CSS polygon() clip-path for a w x h box
+function polygonPoints(clip: string, w: number, h: number): [number, number][] {
+  const m = /polygon\((.*)\)/.exec(clip);
+  if (!m) return [[0, 0], [w, 0], [w, h], [0, h]];
+  return m[1].split(",").map((pair) => {
+    const [x, y] = pair.trim().split(/\s+/);
+    return [toPx(x, w), toPx(y, h)];
+  });
+}
+
+function tracePath(ctx: CanvasRenderingContext2D, pts: [number, number][]) {
+  ctx.beginPath();
+  pts.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+  ctx.closePath();
+}
+
+// A taped note from DeskNotes (Now chapter). The canvas can't read CSS backgrounds,
+// so its paper, textures, dark edges, shadow and tape are drawn here by hand.
+// k: canvas pixels per screen pixel (shadows ignore the canvas scale, so they need it).
+async function paintNote(ctx: CanvasRenderingContext2D, slot: HTMLElement, k: number) {
+  const paper = slot.querySelector<HTMLElement>("[data-paint-paper]");
+  if (!paper) return;
+  const [noise, stain, fibers] = await Promise.all([loadImage(NOISE), loadImage(STAIN), loadImage(FIBERS)]);
+
+  const box = slot.getBoundingClientRect(); // its centre is the note's centre, even tilted
+  const tilt = radians(getComputedStyle(slot).rotate);
+  const w = paper.offsetWidth;
+  const h = paper.offsetHeight;
+  const ps = getComputedStyle(paper);
+  const torn = polygonPoints(ps.clipPath, w, h);
+
+  // ---- Paper ----
+  ctx.save();
+  ctx.translate(box.left + box.width / 2, box.top + box.height / 2);
+  ctx.rotate(tilt);
+  ctx.translate(-w / 2, -h / 2);
+
+  // Paper colour, with the same soft shadow as the CSS drop-shadow
+  const shadow = /drop-shadow\((rgba?\([^)]*\))\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/.exec(
+    getComputedStyle(slot).filter,
+  );
+  if (shadow) {
+    ctx.shadowColor = shadow[1];
+    ctx.shadowOffsetX = parseFloat(shadow[2]) * k;
+    ctx.shadowOffsetY = parseFloat(shadow[3]) * k;
+    ctx.shadowBlur = parseFloat(shadow[4]) * k;
+  }
+  tracePath(ctx, torn);
+  ctx.fillStyle = ps.backgroundColor;
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+
+  // Everything else stays inside the torn shape
+  ctx.clip();
+
+  // Light middle, dark edges (the CSS radial-gradient)
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.scale(1, h / w);
+  const reach = (w / 2) * Math.SQRT2;
+  const edges = ctx.createRadialGradient(0, 0, 0, 0, 0, reach);
+  edges.addColorStop(0, "rgba(255, 240, 205, 0.18)");
+  edges.addColorStop(0.55, "rgba(255, 240, 205, 0)");
+  edges.addColorStop(0.55, "rgba(70, 38, 10, 0)");
+  edges.addColorStop(1, "rgba(70, 38, 10, 0.5)");
+  ctx.fillStyle = edges;
+  ctx.fillRect(-reach, -reach, reach * 2, reach * 2);
+  ctx.restore();
+
+  // Grain, fibres, stains (bottom to top, same order as the CSS)
+  for (const img of [noise, fibers, stain]) {
+    const pattern = ctx.createPattern(img, "repeat");
+    if (!pattern) continue;
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, w, h);
+  }
+  ctx.restore();
+
+  // ---- Tape, on top of the paper ----
+  const tape = slot.querySelector<HTMLElement>("[data-paint-tape]");
+  if (!tape) return;
+  const ts = getComputedStyle(tape);
+  const tw = tape.offsetWidth;
+  const th = tape.offsetHeight;
+
+  ctx.save();
+  ctx.translate(box.left + box.width / 2, box.top + box.height / 2);
+  ctx.rotate(tilt);
+  // From the note's centre to the tape's centre, then the tape's own tilt
+  ctx.translate(tape.offsetLeft + tw / 2 - slot.offsetWidth / 2, tape.offsetTop + th / 2 - slot.offsetHeight / 2);
+  ctx.rotate(radians(ts.rotate));
+  ctx.translate(-tw / 2, -th / 2);
+  tracePath(ctx, polygonPoints(ts.clipPath, tw, th));
+  ctx.fillStyle = ts.backgroundColor;
+  ctx.fill();
+  ctx.clip();
+  const grain = ctx.createPattern(noise, "repeat");
+  if (grain) {
+    ctx.fillStyle = grain;
+    ctx.fillRect(0, 0, tw, th);
+  }
+  ctx.restore();
+}
+
 // sheet: the page element (its background is the paper). texW: picture width in pixels.
 export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTMLCanvasElement> {
   const box = sheet.getBoundingClientRect();
@@ -55,6 +172,10 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
   const svgs: SVGSVGElement[] = [];
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (node instanceof Element) {
+      // Desk notes: paper and tape first, their text gets drawn on top as usual
+      if (node instanceof HTMLElement && node.dataset.paintSlot !== undefined) {
+        await paintNote(ctx, node, k);
+      }
       // Small inline SVGs are drawn last, as images
       if (node instanceof SVGSVGElement) {
         svgs.push(node);
@@ -95,6 +216,9 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
       ctx.fillStyle = cs.color;
       ctx.textBaseline = "alphabetic";
       const upper = cs.textTransform === "uppercase";
+      // Text on a tilted desk note leans with it
+      const noteSlot = el.closest<HTMLElement>("[data-paint-slot]");
+      const lean = noteSlot ? radians(getComputedStyle(noteSlot).rotate) : 0;
       const range = document.createRange();
       for (let i = 0; i < text.length; i++) {
         let ch = text[i];
@@ -114,6 +238,15 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
         const m = ctx.measureText(glyph);
         const a = m.fontBoundingBoxAscent;
         const d = m.fontBoundingBoxDescent;
+        if (lean) {
+          // Spin the letter around its own centre
+          ctx.save();
+          ctx.translate(r.left + r.width / 2, r.top + r.height / 2);
+          ctx.rotate(lean);
+          ctx.fillText(glyph, -m.width / 2, (a - d) / 2);
+          ctx.restore();
+          continue;
+        }
         const baseline = r.top + (r.height - (a + d)) / 2 + a;
         ctx.fillText(glyph, r.left, baseline);
       }
