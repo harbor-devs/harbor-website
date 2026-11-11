@@ -3,8 +3,8 @@ import Book, { type ChapterContent } from "../_components/Book";
 import { introduction } from "../_chapters/Introduction";
 import { now } from "../_chapters/Now";
 import { portfolio } from "../_chapters/Portfolio";
-import { placeholder } from "../_chapters/Placeholder";
 import { services } from "../_chapters/Services";
+import { sketchbook } from "../_chapters/Sketchbook";
 import type { ChapterSlug } from "../_lib/chapters";
 
 // Each chapter's content, by slug
@@ -13,7 +13,7 @@ const CONTENT: Record<ChapterSlug, ChapterContent> = {
   portfolio,
   now,
   services,
-  sketchbook: placeholder("sketchbook"),
+  sketchbook,
 };
 
 // Stays on screen across all chapters, so the book never reloads.
