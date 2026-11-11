@@ -3,9 +3,21 @@ import { CATEGORIES, categoryHref } from "../_lib/portfolio";
 import styles from "./ChapterContents.module.css";
 
 // The dotted category list on the Portfolio page. Same look as the Intro contents list.
-export default function CategoryList({ variant }: { variant: "book" | "phone" }) {
+// On the laptop page: an optional heading above it and an optional hint line under it.
+export default function CategoryList({
+  variant,
+  heading,
+  hint,
+}: {
+  variant: "book" | "phone";
+  heading?: string;
+  hint?: string;
+}) {
+  const isBook = variant === "book";
+
   return (
-    <nav aria-label="Portfolio categories" className={variant === "book" ? styles.book : styles.phone}>
+    <nav aria-label="Portfolio categories" className={isBook ? styles.book : styles.phone}>
+      {isBook && heading && <h3 className={styles.heading}>{heading}</h3>}
       <ol className={styles.list}>
         {CATEGORIES.map((c) => (
           <li key={c.slug}>
@@ -17,6 +29,7 @@ export default function CategoryList({ variant }: { variant: "book" | "phone" })
           </li>
         ))}
       </ol>
+      {isBook && hint && <p className={styles.hint}>{hint}</p>}
     </nav>
   );
 }

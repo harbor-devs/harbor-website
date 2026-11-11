@@ -13,6 +13,15 @@
   text-decoration: none;
 }
 
+/* Names look like links: madder red with a soft underline */
+.itemTitle {
+  color: var(--color-madder);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(139, 46, 35, 0.4);
+  text-underline-offset: 4px;
+}
+
 .dots {
   flex: 1;
   height: 0;
@@ -26,12 +35,11 @@
   color: var(--color-ink-soft);
 }
 
+/* Hover: the underline goes full strength */
 .item:hover .itemTitle,
 .item:focus-visible .itemTitle {
-  color: var(--color-madder);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  text-decoration-color: var(--color-madder);
+  text-decoration-thickness: 2px;
 }
 
 /* Brass focus ring is too faint on paper */
@@ -40,12 +48,21 @@
 }
 
 /* Laptop: lives inside a .ruled block, so every row is one 30px line.
-   One empty line above "Contents", then one line per chapter. */
+   One empty line above the heading, then one line per item. */
 .heading {
   margin: calc(30 * var(--u)) 0 0;
   font-size: calc(22 * var(--u));
   line-height: calc(30 * var(--u));
   font-style: italic;
+}
+
+/* Small italic hint under the list, one ruled line tall */
+.hint {
+  margin: 0;
+  font-size: calc(17 * var(--u));
+  line-height: calc(30 * var(--u));
+  font-style: italic;
+  color: var(--color-ink-soft);
 }
 
 .book .list {
@@ -67,7 +84,7 @@
   position: absolute;
   left: calc(36 * var(--u));
   right: calc(26 * var(--u));
-    top: calc(216 * var(--u));
+  top: calc(216 * var(--u));
 }
 
 .phone .list {

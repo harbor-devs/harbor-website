@@ -110,3 +110,9 @@ export const UPCOMING: Partial<Record<CategorySlug, string>> = {
   articles:
     "Coming next: research papers on Lahore's smog and the real energy and water cost of AI, plus more articles, starting with the business of being sick.",
 };
+
+// A typed note pinned right after the board's title paper, read before any item.
+export const NOTES: Partial<Record<CategorySlug, string>> = {
+  articles:
+    "A note before you read: I write about things I cannot stop questioning. For each one I research properly, check every claim against real sources, and use AI to help me put it into words. The questions and the experiences in them are my own.",
+};

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { boardFonts } from "../_lib/boardFonts";
 import type { Category } from "../_lib/portfolio";
-import { UPCOMING, type PortfolioItem, type Status } from "../_lib/portfolioItems";
+import { NOTES, UPCOMING, type PortfolioItem, type Status } from "../_lib/portfolioItems";
 import { MarkerCircle, MarkerInk, PaperClip, StartHere, Tape, UnderSheet } from "./BoardProps";
 import d from "./BoardProps.module.css";
 import s from "./Board.module.css";
@@ -22,13 +22,14 @@ const STAMP: Record<Status, { label: string; className: string }> = {
   live: { label: "LIVE", className: s.live },
   prototype: { label: "PROTOTYPE", className: s.proto },
   "in-progress": { label: "IN PROGRESS", className: s.progress },
-    published: { label: "PUBLISHED", className: s.live },
+  published: { label: "PUBLISHED", className: s.live },
 };
 
 export default function Board({ category, items }: { category: Category; items: readonly PortfolioItem[] }) {
   // "Software & Websites" shows as "Software and Websites" with a small italic "and"
   const [first, second] = category.title.split(" & ");
   const count = `${items.length} ${items.length === 1 ? "CASE" : "CASES"} POSTED`;
+  const note = NOTES[category.slug];
 
   return (
     <main className={`${s.wall} ${boardFonts}`}>
@@ -60,6 +61,14 @@ export default function Board({ category, items }: { category: Category; items: 
             </p>
             <p className={s.orn} aria-hidden="true">&#10087; &#10087; &#10087;</p>
           </header>
+
+          {/* A typed note read before any item, e.g. how the articles are written */}
+          {note && (
+            <p className={`${s.aged} ${s.tornC} ${s.pin} ${s.scrap}`} style={pinned(items.length + 2)}>
+              <span className={s.nail} aria-hidden="true" />
+              {note}
+            </p>
+          )}
 
           {items.map((item, i) => {
             const stamp = (
@@ -110,7 +119,7 @@ export default function Board({ category, items }: { category: Category; items: 
                 </article>
 
                 {i === 0 && <StartHere />}
-                                {i % 4 === 1 && (
+                {i % 4 === 1 && (
                   <>
                     <UnderSheet />
                     <PaperClip />
@@ -127,7 +136,7 @@ export default function Board({ category, items }: { category: Category; items: 
               Nothing is pinned here yet.
             </p>
           )}
-          
+
           {UPCOMING[category.slug] && (
             <p className={`${s.aged} ${s.tornC} ${s.pin} ${s.scrap}`} style={pinned(items.length + 1)}>
               <span className={s.nail} aria-hidden="true" />
