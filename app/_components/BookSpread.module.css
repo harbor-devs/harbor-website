@@ -140,8 +140,10 @@
   transition: opacity 300ms ease 800ms;
 }
 
+/* No delay: the swing script hides the left page edges while the cover moves,
+   so they show the moment it lands, under the cover's identical copy */
 .stackLeft {
-  transition: opacity 0s linear var(--duration-cover);
+  transition: none;
 }
 .stage[data-closed] .stackLeft {
   opacity: 0;

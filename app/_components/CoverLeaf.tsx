@@ -67,18 +67,21 @@ const all = (x: Parts) => [
 // Puts everything where it belongs for swing amount v (0 = shut, 1 = open).
 // At 0 and 1 every value matches the CSS resting state, so handing back to CSS can't be seen.
 function draw(x: Parts, v: number) {
-  // The open book's own edges and shadow: there as soon as the cover lifts
+  // The open book's own edges: there as soon as the cover lifts
   const lifted = ramp(0, 0.1, v);
+  // Shadows change slowly over the swing, so nothing jumps:
+  // the shut book's soft shadow fades out while the open book's fades in
+  const shadowIn = ramp(0, 0.6, v);
 
   setStyle(x.book, "transform", v === 1 ? "none" : `scale(${0.85 + 0.15 * v}) translateX(${-25 * (1 - v)}%)`);
   setStyle(x.board, "opacity", lifted);
   setStyle(x.board, "clip-path", v < 1 ? "inset(0 0 0 50%)" : "inset(0)"); // left half only once it has landed
-  setStyle(x.shadowRight, "opacity", lifted);
+  setStyle(x.shadowRight, "opacity", shadowIn);
   setStyle(x.stackRight, "opacity", lifted);
   setStyle(x.stackLeft, "opacity", v < 1 ? 0 : 1);
 
-  setStyle(x.base, "opacity", 1 - lifted);
-  setStyle(x.ground, "opacity", ramp(0.65, 1, v)); // its shadow arrives as it comes down on the left
+  setStyle(x.base, "opacity", 1 - shadowIn);
+  setStyle(x.ground, "opacity", ramp(0.35, 1, v)); // its shadow arrives slowly as it comes down on the left
   setStyle(x.cast, "opacity", v > 0 ? 1 - ramp(0, 0.25, v) : 0); // on the right page while it's just above it
 
   setStyle(x.leaf, "transform", v === 0 ? "none" : `rotateY(${-180 * v}deg)`);
