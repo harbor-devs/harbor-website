@@ -16,16 +16,16 @@ const LAST = N - 1;
 const SHUT = 0; // blade angle when fully shut: all edges meet exactly in the middle
 
 // The hole grows at an even pace from shut until the whole screen is clear
-const FIRST_OPEN_MS = 1500;
+const FIRST_OPEN_MS = 2000;
 const CLOSE_MS = 600;
 const HOLD_MS = 250;
-const PAGE_OPEN_MS = 1200;
+const PAGE_OPEN_MS = 1600;
 const FADE_MS = 250;
 const MAX_WAIT_MS = 4000; // never stay shut longer than this, even if a picture hangs
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const easeIn = (t: number) => t * t;
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3); // opening: snaps apart, then slows down
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 2); // opening: starts moving at once, slows gently
 
 // Still drawing for the very first paint (before JavaScript runs). Same blades as the WebGL one.
 const R = 150; // pin circle in drawing units; "slice" below makes it 0.75 x the longer screen side
