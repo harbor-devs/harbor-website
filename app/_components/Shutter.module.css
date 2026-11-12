@@ -1,0 +1,35 @@
+/* The camera shutter that covers the whole screen (Shutter.tsx) */
+.shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Fully open: taken off the screen so it never blocks clicks */
+.shutter[data-open="true"] {
+  display: none;
+}
+
+.still,
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Once WebGL has drawn, the still first-paint drawing is not needed */
+.shutter[data-gl="on"] .still {
+  display: none;
+}
+
+/* Thin brass line on each blade's cutting edge (still drawing only) */
+.brass {
+  fill: none;
+  stroke: #a8823c;
+  stroke-opacity: 0.9;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}

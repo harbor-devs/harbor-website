@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { EB_Garamond, IM_Fell_English } from "next/font/google";
 import { preload } from "react-dom";
 import PreloadTextures from "./_components/PreloadTextures";
+import Shutter from "./_components/Shutter";
 import "./globals.css";
 
 // Body text font
@@ -50,6 +51,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${garamond.variable} ${fell.variable} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col">
+        {/* Camera shutter: shut while the site loads, and between the book and category pages */}
+        <Shutter />
         {children}
         <PreloadTextures />
       </body>

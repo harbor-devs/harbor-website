@@ -31,7 +31,8 @@ export default function ClosedBook({ bare = false, phone = false }: ClosedBookPr
         <span className={styles.spineText}>Harbor &middot; Vol. I</span>
       </span>
 
-      <span aria-hidden="true" className={styles.face}>
+      {/* data-shutter-center: the camera shutter opens on the middle of this face */}
+      <span aria-hidden="true" className={styles.face} data-shutter-center="">
         <span className={styles.kicker}>Vol. I &middot; MMXXVI</span>
 
         {/* Arrow ornament with a knot in the middle */}
@@ -54,13 +55,13 @@ export default function ClosedBook({ bare = false, phone = false }: ClosedBookPr
 
         <span className={styles.title}>Harbor</span>
         <Flourish className={styles.flourish} />
-       <span className={styles.subtitle}>
-  The working notebook
-  <br />
-  of
-  <br />
-  Abdullah Saghir
-</span>
+        <span className={styles.subtitle}>
+          The working notebook
+          <br />
+          of
+          <br />
+          Abdullah Saghir
+        </span>
       </span>
     </Link>
   );
