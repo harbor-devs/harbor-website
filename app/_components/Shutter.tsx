@@ -200,22 +200,24 @@ export default function Shutter() {
       }
     };
 
-    // Lets the page finish setting itself up, so the opening is not fighting it for the first frames
+     // Lets the page finish setting itself up, so the opening is not fighting it for the first frames.
+    // Waits until the browser is free (up to 1 second), then two more frames.
     const settle = async () => {
       await new Promise<void>((r) =>
-        "requestIdleCallback" in window ? requestIdleCallback(() => r(), { timeout: 300 }) : setTimeout(r, 100),
+        "requestIdleCallback" in window ? requestIdleCallback(() => r(), { timeout: 1000 }) : setTimeout(r, 300),
       );
       await frame();
       await frame();
     };
-
-    // 1. First opening of the site
+    // 1. First opening of the site. When done, tell PreloadTextures it can start downloading.
     ready(location.pathname).then(async () => {
       if (!alive) return;
       await settle();
       if (!alive) return;
       await open(FIRST_OPEN_MS);
       busy = false;
+      document.documentElement.dataset.shutterOpen = "true";
+      window.dispatchEvent(new Event("harbor:shutter-open"));
     });
 
     // Redraw at the new size if the window or phone is turned while shut

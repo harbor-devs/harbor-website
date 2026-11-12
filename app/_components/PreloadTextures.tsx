@@ -5,6 +5,8 @@ import { useEffect } from "react";
 // Downloads the paper pictures in the background once the site has opened,
 // so a page already has its paper when it turns (no brown flash, no text-first pop in).
 // Same 900px split as the book: phones get the phone pages, laptops the big spread.
+// It waits until the camera shutter has finished opening, so the download
+// doesn't make the opening stutter on a first visit.
 
 const PHONE = [
   "/textures/page-phone-intro.webp",
@@ -23,8 +25,11 @@ export default function PreloadTextures() {
   useEffect(() => {
     const isLaptop = window.matchMedia("(min-width: 900px)").matches;
     const list = [...(isLaptop ? LAPTOP : PHONE), ...BOTH];
+    let started = false;
 
     const start = () => {
+      if (started) return;
+      started = true;
       for (const src of list) {
         const img = new Image();
         img.decoding = "async";
@@ -33,13 +38,18 @@ export default function PreloadTextures() {
       }
     };
 
-    // Wait until the first screen is done, so the cover loads first
-    if (document.readyState === "complete") {
+    // The shutter already opened (or there is none): start now
+    if (document.documentElement.dataset.shutterOpen === "true") {
       start();
       return;
     }
-    window.addEventListener("load", start, { once: true });
-    return () => window.removeEventListener("load", start);
+    // Otherwise wait for the shutter to say it is open, but never more than 8 seconds
+    window.addEventListener("harbor:shutter-open", start, { once: true });
+    const fallback = window.setTimeout(start, 8000);
+    return () => {
+      window.removeEventListener("harbor:shutter-open", start);
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return null;
