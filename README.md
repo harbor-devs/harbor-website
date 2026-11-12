@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Harbor
 
-## Getting Started
+The website for Harbor: the working notebook of Abdullah Saghir. It holds his
+software, websites and writing, and it is the place to hire him (through his
+Upwork profile) for websites, web apps and small tools.
 
-First, run the development server:
+The site is designed as a vintage diary. It opens as a closed book and is read
+chapter by chapter, with real page turns on laptop and on phone.
+
+**Status:** finished, getting ready to go live at harbordevs.com (hosted on Netlify).
+
+## Built with
+
+- [Next.js](https://nextjs.org) 16 (App Router) and React 19
+- TypeScript
+- Tailwind CSS v4 and CSS Modules
+- [page-flip](https://github.com/Nodlik/StPageFlip) for the laptop page turn,
+  and a small WebGL page curl for phones
+
+No backend, database or tracking.
+
+## Run it locally
+
+Needs [Node.js](https://nodejs.org) (LTS).
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Starts the dev server |
+| `npm run lint` | Checks code style |
+| `npm run build` | Makes a production build |
+| `npm run start` | Runs the production build locally |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project docs
 
-## Learn More
+- [PROJECT.md](PROJECT.md): design rules, folder map, standards and the plan
+- [docs/book-engine.md](docs/book-engine.md): how the book and its page turns work
+- [docs/textures.md](docs/textures.md): how the paper and desk textures are made
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All rights reserved. The code is public so it can be read, not reused.
+See [LICENSE](LICENSE).

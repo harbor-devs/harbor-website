@@ -28,6 +28,7 @@ All sizes below are CSS pixels. The image files are 2x that.
 | `page-phone-sketchbook.webp` | 330 x 467 | Phone page, Sketchbook | Same |
 | `page-phone-contact.webp` | 330 x 467 | Phone page, Contact | Same |
 | `curl-phone.webp` | 96 x 539 | Pages folded back around the left edge, phone | Offset left -70, top -26 from the phone page box (includes its own shadow) |
+| `cover.webp` | 660 x 840 | Closed cover (front of the book) | Fills the cover box, `background-size: 100% 100%` (includes its own shadow margin) |
 
 Each phone page has its own stain pattern, which is why there are six files.
 The paper images already include the ruled lines, margin lines, stains and
@@ -42,19 +43,14 @@ These have no filters in the mockup, so they stay as CSS:
 
 ## Not baked yet
 
-Closed cover, back cover and the thank-you flower. Bake them when those parts get built.
+Back cover and the thank-you flower. Bake them when those parts get built.
 
 ## Changes
 
+- Oct 25, 2026: baked `cover.webp` for the closed cover.
 - Oct 25, 2026: re-baked `paper-spread.webp` and all six `page-phone-*.webp`
-  with darker ruled lines (laptop rule opacity 0.5 to 0.9, phone 0.6 to 1.0).
-  Same method and settings as above, nothing else changed.
-  ## Re-bake: darker ruled lines (Oct 25, 2026)
-
-All 7 paper textures were re-baked with darker ruled lines so the pages read more clearly.
-
-- Laptop spread textures: ruled line opacity 0.9
-- Phone page textures: ruled line opacity 1.0
-
-Reason: after the design lock, the lines looked too faint on real screens (picked option C).
-Note: the Claude Design canvas still shows the older, lighter lines. Update it after Step 4.
+  with darker ruled lines (laptop rule opacity 0.5 to 0.9, phone 0.6 to 1.0),
+  because the lines looked too faint on real screens. Same method and
+  settings as above, nothing else changed. The Claude Design canvas still
+  shows the older, lighter lines; update it in Phase 4.
+  

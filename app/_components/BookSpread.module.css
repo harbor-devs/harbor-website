@@ -13,7 +13,11 @@
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  padding: var(--chrome-top) 16px var(--chrome-bottom);
+   /* 96px each side: room for the round arrows beside the book */
+  padding: var(--chrome-top) 96px var(--chrome-bottom);
+  /* The cover image's baked shadow hangs below the window even when hidden.
+     Cut it at the window edge so no scrollbar appears. */
+  overflow: clip;
 }
 
 .book {
@@ -30,43 +34,50 @@
   container-type: inline-size;
   /* 1 canvas pixel. Only used by children, never by .book itself. */
   --u: calc(100cqw / 1060);
+
+  /* Slides to the center (and grows a little) while a cover opens or closes */
+  transition: transform var(--duration-cover) var(--ease-turn);
 }
 
+/* Front shut: a bit smaller, slid left by half a page so the cover sits in the middle */
+.stage[data-closed] .book {
+  transform: scale(0.85) translateX(-25%);
+}
+
+/* Back shut: same, slid the other way */
+.stage[data-back-closed] .book {
+  transform: scale(0.85) translateX(25%);
+}
+
+/* The leather board. No shadow of its own: the shadow is two halves
+   (.shadowRight here, .ground in CoverLeaf), so nothing ever has to be
+   cut at the spine. Cutting a shadow left a hard line under the book. */
 .board {
   position: absolute;
   inset: 0;
   border-radius: calc(6 * var(--u));
   background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* Shadow under the right half of the book */
+.shadowRight {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
   box-shadow:
     0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
     0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
 }
 
-/* One sheet per side: the page plus the stack edges peeking out under it.
-   The sheet is what turns, so the edges always travel with their page. */
-.sheetLeft,
-.sheetRight {
-  position: absolute;
-  top: calc(8 * var(--u));
-  width: calc(520 * var(--u));
-  height: calc(640 * var(--u));
-}
-
-.sheetLeft {
-  left: calc(10 * var(--u));
-}
-
-.sheetRight {
-  left: calc(530 * var(--u));
-}
-
-/* Page stacks peeking out under the paper (positions are inside the sheet) */
+/* Page stacks peeking out under the paper. They stay still while pages turn. */
 .stackLeft,
 .stackRight {
   position: absolute;
-  left: 0;
-  top: calc(4 * var(--u));
-  width: 100%;
+  top: calc(12 * var(--u));
+  width: calc(520 * var(--u));
   /* Taller than the paper so 8px of page edges show at the bottom */
   height: calc(644 * var(--u));
   /* Fine cream and tan lines, like the edges of a real paper stack */
@@ -80,6 +91,7 @@
 }
 
 .stackLeft {
+  left: calc(10 * var(--u));
   border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
   box-shadow:
     inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
@@ -90,6 +102,7 @@
 }
 
 .stackRight {
+  left: calc(530 * var(--u));
   border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
   box-shadow:
     inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
@@ -99,36 +112,96 @@
     calc(4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
 }
 
-/* The two pages, padding copied from the canvas.
-   Each one paints its half of the baked paper image. */
-.pageLeft,
-.pageRight {
+/* ---------- Front cover opening and closing ----------
+   Right half (board edge, its shadow, right stack): fades in as the cover
+   starts lifting, fades out as the cover lands back on it.
+   Left half (board, left stack): only appears under the landed cover, and
+   hides the moment it starts closing, so the switch is never seen. */
+
+.board {
+  clip-path: inset(0);
+  transition:
+    opacity 300ms ease,
+    clip-path 0s linear var(--duration-cover);
+}
+.stage[data-closed] .board {
+  opacity: 0;
+  /* Left half cut off (the board has no shadow, so this leaves no line) */
+  clip-path: inset(0 0 0 50%);
+  transition:
+    opacity 300ms ease 800ms,
+    clip-path 0s;
+}
+
+.shadowRight,
+.stackRight {
+  transition: opacity 300ms ease;
+}
+.stage[data-closed] .shadowRight,
+.stage[data-closed] .stackRight {
+  opacity: 0;
+  transition: opacity 300ms ease 800ms;
+}
+
+/* No delay: the swing script hides the left page edges while the cover moves,
+   so they show the moment it lands, under the cover's identical copy */
+.stackLeft {
+  transition: none;
+}
+.stage[data-closed] .stackLeft {
+  opacity: 0;
+  transition: opacity 0s;
+}
+
+/* ---------- Back cover closing and opening ----------
+   The mirror image. While the back cover isn't resting open (BackLeaf
+   carries a copy of the right half), the real right half hides at once.
+   It comes back the moment the back cover lands open again. */
+
+.stage[data-clip-right] .shadowRight,
+.stage[data-clip-right] .stackRight {
+  opacity: 0;
+  transition: none;
+}
+
+/* Back shut: the left half hides under the back cover's baked image as it lands */
+.stage[data-back-closed] .board {
+  opacity: 0;
+  /* Right half cut off */
+  clip-path: inset(0 50% 0 0);
+  transition:
+    opacity 300ms ease 800ms,
+    clip-path 0s;
+}
+.stage[data-back-closed] .stackLeft {
+  opacity: 0;
+  transition: opacity 300ms ease 800ms;
+}
+/* Back reopening: the left half comes straight back as the baked image fades */
+.stage[data-clip-right]:not([data-back-closed]) .stackLeft {
+  transition: opacity 300ms ease;
+}
+
+/* Where the two pages sit (and turn). The page styles live in FlipBook.module.css. */
+.pages {
   position: absolute;
-  inset: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  background-image: url("/textures/paper-spread.webp");
-  /* The image covers both pages, so each page shows half of it */
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  /* Text: darkest ink, slightly heavier, scales with the book */
-  color: var(--color-ink);
-  font-weight: 500;
-  font-size: calc(18 * var(--u));
-  line-height: calc(30 * var(--u));
+  top: calc(8 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(1040 * var(--u));
+  height: calc(640 * var(--u));
 }
 
-.pageLeft {
-  background-position: left top;
-  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
-  padding: calc(52 * var(--u)) calc(64 * var(--u)) calc(48 * var(--u)) calc(60 * var(--u));
+/* While the front cover is closed or swinging, only the right page shows */
+.stage[data-clip] .pages {
+  clip-path: inset(0 0 0 50%);
 }
 
-.pageRight {
-  background-position: right top;
-  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
-  padding: calc(52 * var(--u)) calc(60 * var(--u)) calc(48 * var(--u)) calc(64 * var(--u));
+/* While the back cover is closed or swinging, only the left page shows */
+.stage[data-clip-right] .pages {
+  clip-path: inset(0 50% 0 0);
+}
+.stage[data-clip][data-clip-right] .pages {
+  clip-path: inset(0 50%);
 }
 
 /* Nav slots, sitting in the space .stage keeps free */
@@ -146,4 +219,34 @@
   left: 0;
   right: 0;
   height: var(--chrome-bottom);
+}
+
+/* Bottom bar / "Click to open" fade in once the book has finished moving */
+.footer > * {
+  animation: footer-in 400ms ease both;
+}
+
+@keyframes footer-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book,
+  .board,
+  .shadowRight,
+  .stackLeft,
+  .stackRight,
+  .stage[data-closed] .board,
+  .stage[data-closed] .shadowRight,
+  .stage[data-closed] .stackLeft,
+  .stage[data-closed] .stackRight,
+  .stage[data-back-closed] .board,
+  .stage[data-back-closed] .stackLeft,
+  .stage[data-clip-right]:not([data-back-closed]) .stackLeft {
+    transition: none;
+  }
+  .footer > * {
+    animation: none;
+  }
 }

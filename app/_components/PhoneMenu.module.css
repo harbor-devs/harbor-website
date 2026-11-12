@@ -49,7 +49,7 @@
   background: url("/textures/page-phone-intro.webp") 0 0 / 100% 100% no-repeat;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   container-type: inline-size;
-  /* 1 canvas pixel, same system as PhonePage */
+  /* 1 canvas pixel, same system as PhoneBook */
   --u: calc(100cqw / 330);
   font-weight: 500;
 }

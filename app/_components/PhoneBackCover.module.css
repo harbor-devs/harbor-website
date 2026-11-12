@@ -1,0 +1,138 @@
+/* Phone back cover. Same shape as the phone diary page (330 x 467), so the
+   swinging back cover and the resting one line up exactly.
+   Widths use the laptop back cover's canvas px (board 518.75 wide, --u).
+   Heights are % of the board, so the art stretches to the taller page
+   (same trick as the phone front cover in ClosedBook). */
+
+/* Resting cover: mirrored, so the spine is on the right */
+.flip {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
+}
+
+.board {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+  --u: calc(100cqw / 518.75);
+}
+
+/* The baked cover image (same image and stretch as the phone front cover):
+   16% extra left and right, 12.5% above, 131.25% tall */
+.texture {
+  position: absolute;
+  left: -16%;
+  top: -12.5%;
+  width: 132%;
+  height: 131.25%;
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* Bare (the swinging cover): just the board. Page edges, ribbon and shadow stay with the pages. */
+.board[data-bare] .texture {
+  clip-path: inset(9.524% 12.121% 14.286% 12.121%);
+}
+
+/* Small faded logo, low on the back. Flipped back so it reads the right way. */
+.mark {
+  position: absolute;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  bottom: 12.65%;
+  display: flex;
+  justify-content: center;
+  transform: scaleX(-1);
+}
+
+.logo {
+  width: calc(64 * var(--u));
+  height: auto;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* The thank-you: same box and flip as .mark, so all three share one center line */
+.gift {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  transform: scaleX(-1);
+}
+
+/* The note, in ink on the cover */
+.note {
+  position: absolute;
+  top: 8.43%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: calc(24 * var(--u));
+  line-height: calc(37 * var(--u));
+  color: var(--color-ink);
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+  animation: ink-in 800ms ease 300ms both;
+}
+
+.sig {
+  display: block;
+  margin-top: calc(10 * var(--u));
+  font-style: italic;
+  font-size: calc(22 * var(--u));
+  opacity: 0.75;
+}
+
+/* The pressed flower, standing up with a slight lean, between the note and the logo */
+.flower {
+  position: absolute;
+  top: 37.65%;
+  left: 50%;
+  width: calc(200 * var(--u));
+  height: auto;
+  transform: translateX(-50%) rotate(10deg);
+  animation: flower-place 900ms var(--ease-arrive) 1100ms both;
+}
+
+/* On the swinging cover they're already there: no animation */
+.board[data-still] .note,
+.board[data-still] .flower {
+  animation: none;
+}
+
+@keyframes ink-in {
+  from { opacity: 0; filter: blur(1px); }
+  to { opacity: 0.9; filter: blur(0); }
+}
+@keyframes flower-place {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* The last chapter / "Read again" bar under the book, same gap as "Tap to open".
+   Full width, centered, and each link stays on one line. */
+.bar {
+  padding-top: 36px;
+}
+
+.bar nav {
+  width: 100%;
+  margin-left: 0;
+  padding-top: 0;
+}
+
+.bar a {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note,
+  .flower {
+    animation: none;
+  }
+}

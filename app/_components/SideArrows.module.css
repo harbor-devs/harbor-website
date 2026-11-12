@@ -1,0 +1,54 @@
+/* Round arrow buttons beside the laptop book.
+   They live in the bar under the book, so 0 is the book's bottom edge.
+   Numbers with --u are book canvas pixels (the book is 1060 x 664). */
+
+.arrows {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.arrow {
+  position: absolute;
+  /* Halfway up the book (664 / 2) */
+  top: calc(-332 * var(--u));
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid #c9bca4;
+  background: rgba(242, 232, 213, 0.08);
+  color: #e6d8bc;
+  pointer-events: auto;
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.arrow svg {
+  width: 24px;
+  height: 24px;
+}
+
+.arrow:hover {
+  background: rgba(242, 232, 213, 0.18);
+  border-color: var(--color-paper);
+  color: var(--color-paper);
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 4px;
+}
+
+/* Just outside the book's left and right edges */
+.left {
+  right: calc(100% + 28 * var(--u));
+}
+
+.right {
+  left: calc(100% + 28 * var(--u));
+}

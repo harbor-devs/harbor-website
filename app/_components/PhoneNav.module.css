@@ -20,12 +20,22 @@
   height: 100%;
   box-sizing: border-box;
   padding-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  /* Three equal columns: the count always sits dead center */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
   font-size: 15px;
   line-height: 24px;
   color: var(--color-paper-deep);
+}
+
+/* Previous link hugs the left, next link hugs the right */
+.bar > .link:first-child {
+  justify-self: start;
+}
+
+.bar > .link:last-child {
+  justify-self: end;
 }
 
 .link {

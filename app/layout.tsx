@@ -19,9 +19,22 @@ const fell = IM_Fell_English({
   display: "swap",
 });
 
+// Tab title, search description and link previews (WhatsApp, LinkedIn, X).
+// The tab icon and preview picture are the files app/icon.png, app/apple-icon.png,
+// app/favicon.ico and app/opengraph-image.png (Next.js picks them up by name).
 export const metadata: Metadata = {
-  title: "Harbor",
-  description: "Harbor, by Abdullah Saghir.",
+  // The live address, so previews can find the picture
+  metadataBase: new URL("https://harbordevs.com"),
+  title: { default: "Harbor", template: "%s · Harbor" },
+  description:
+    "The working notebook of Abdullah Saghir. Websites, web apps and small tools, made with care.",
+  openGraph: {
+    siteName: "Harbor",
+    type: "website",
+    locale: "en_US",
+    url: "/",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

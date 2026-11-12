@@ -1,0 +1,139 @@
+/* Phone back cover layout (stage, header, main, bookWrap), the phone
+   "Tap to open" slot, and the laptop "Click to open" hint. */
+
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Space taken by header + hint + ribbon, so the book always fits the screen */
+  --chrome: 260px;
+}
+
+.header {
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0 32px;
+}
+
+/* The book picks the smallest of: canvas size, screen width, screen height */
+.bookWrap {
+  width: min(500px, calc(100vw - 80px), calc((100dvh - var(--chrome)) * 500 / 640));
+}
+
+/* Phone shut cover: undo the diary page's shift to the right (that's room for
+   the curl, and a shut book has none). "main." makes this win over the page's rule.
+   pan-y: up/down still scrolls, sideways swipes come to us (to swing it open). */
+main.centered {
+  translate: none;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hint {
+  margin: 48px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 500;
+  text-align: center;
+  color: #e6d8bc;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.hint:hover {
+  color: var(--color-paper);
+}
+
+/* Phone: the hint in the diary's bottom slot, under the cover.
+   The left padding moves it about 5px right, so it sits under the paper
+   (the dark spine on the left makes the paper's middle a bit right of the box's middle). */
+.phoneHintSlot {
+  display: flex;
+  justify-content: center;
+  padding-top: 36px;
+  padding-left: 10px;
+}
+
+.phoneHintSlot .hint {
+  margin: 0;
+}
+
+/* Laptop: one row under the closed cover (which sits on the right half of the book):
+   a round arrow button, then "Open the book" with a smaller line under it. */
+.hintSlot {
+  margin-left: 50%;
+  width: 50%;
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-decoration: none;
+  color: #e6d8bc;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/* The round button with the arrow */
+.hintCircle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid #c9bca4;
+  background: rgba(242, 232, 213, 0.08);
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.hintCircle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hintSlot:hover .hintCircle {
+  background: rgba(242, 232, 213, 0.18);
+  border-color: var(--color-paper);
+}
+
+/* The two lines of text, stacked, left-aligned next to the button */
+.hintSlot > span:not(.hintCircle) {
+  display: block;
+}
+
+.hintTitle,
+.hintSub {
+  text-align: left;
+}
+
+.hintTitle {
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 500;
+}
+
+.hintSub {
+  font-size: 14px;
+  line-height: 18px;
+  color: #c9bca4;
+}
+
+.hintSlot:hover .hintTitle {
+  color: var(--color-paper);
+}

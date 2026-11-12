@@ -1,0 +1,32 @@
+/* Sketchbook idea list. Numbers are canvas pixels (--u). */
+
+/* Laptop: one empty ruled line (30px) between ideas, so they stay on the lines */
+.list > .idea {
+  margin: 0;
+}
+.list > .idea + .idea {
+  margin-top: calc(30 * var(--u));
+}
+
+/* Phone: one idea per ruled line of the phone paper.
+   Measured from page-phone-sketchbook.webp: lines are 32px apart, first one at 241.5px.
+   Each 32px row ends on a line, so the text sits just above it. */
+.listPhone {
+  position: absolute;
+  top: calc(217 * var(--u));
+  left: calc(36 * var(--u));
+  right: calc(26 * var(--u));
+  font-size: calc(15.5 * var(--u));
+  line-height: calc(32 * var(--u));
+}
+.listPhone > .idea {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The small "what it is" label after the name */
+.what {
+  color: var(--color-ink-soft);
+}

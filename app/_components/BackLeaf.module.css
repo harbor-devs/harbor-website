@@ -1,0 +1,301 @@
+/* The swinging back cover. Numbers are canvas pixels of the open book (1060 x 664).
+   Open, it lies on the right half with its left edge on the spine.
+   Shut, it lies on the left half, the front cover's mirror image.
+   These rules are the two resting states (open and shut). While it swings,
+   BackLeaf.tsx writes every moving part straight onto the elements. */
+
+.slot {
+  position: absolute;
+  inset: 0;
+  /* Depth for the swing */
+  perspective: calc(2600 * var(--u));
+  pointer-events: none;
+}
+
+/* ---------- Shut: page edges, ribbon, shadow around the back cover ----------
+   Same baked image and hole as CoverLeaf's .base, flipped and moved to the
+   left half. The hole is exactly the board (x 11.25 to 530). */
+
+.base {
+  position: absolute;
+  left: calc(-71.75 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  box-sizing: border-box;
+  padding: calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+  transform: scaleX(-1);
+  opacity: 0;
+}
+.slot[data-shut] .base {
+  opacity: 1;
+}
+
+/* ---------- The right half's shadow on the desk ----------
+   Shows only while this cover is open but not yet handed over
+   (BookSpread's .shadowRight takes over after, and they're identical).
+   Cut away only where it would darken the left page. */
+
+.ground {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
+  box-shadow:
+    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
+    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+  clip-path: polygon(
+    calc(730 * var(--u)) calc(-200 * var(--u)),
+    0 calc(-200 * var(--u)),
+    0 calc(664 * var(--u)),
+    calc(-270 * var(--u)) calc(664 * var(--u)),
+    calc(-270 * var(--u)) calc(900 * var(--u)),
+    calc(730 * var(--u)) calc(900 * var(--u))
+  );
+  opacity: 0;
+}
+.slot:not([data-shut]):not([data-done]) .ground {
+  opacity: 1;
+}
+
+/* ---------- The cover ---------- */
+
+.leaf {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* Swung over to the left */
+.slot[data-shut] .leaf {
+  transform: rotateY(-180deg);
+}
+
+/* Shut and resting: the mouse can grab it and drag it open */
+.slot[data-rested] .leaf {
+  pointer-events: auto;
+}
+
+/* Open and resting: hand over to the real right page (looks identical) */
+.slot[data-done] .leaf {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+/* Inside (seen while open): a copy of the open book's right half */
+.inside {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 calc(6 * var(--u)) calc(6 * var(--u)) 0;
+}
+
+.board {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* Exact copy of .stackRight in BookSpread.module.css */
+.stack {
+  position: absolute;
+  top: calc(12 * var(--u));
+  left: 0;
+  width: calc(520 * var(--u));
+  height: calc(644 * var(--u));
+  border-radius: 0 calc(3 * var(--u)) calc(3 * var(--u)) 0;
+  background: repeating-linear-gradient(
+    to top,
+    #e8dabd 0,
+    #e8dabd calc(1.2 * var(--u)),
+    #bba57d calc(1.2 * var(--u)),
+    #bba57d calc(2 * var(--u))
+  );
+  box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
+    var(--u) var(--u) 0 #e6d8bc,
+    calc(2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
+}
+
+/* The right page, in exactly the real right page's spot */
+.page {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: 0;
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+}
+
+/* Outside (seen once shut): the front cover board, mirrored by the swing.
+   Same size as the closed front cover (500 x 640 drawn at 518.75 x 664). */
+.outside {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(518.75 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
+  opacity: 0;
+}
+
+/* The baked cover image cut down to just the board (like ClosedBook bare) */
+.texture {
+  position: absolute;
+  left: calc(-83 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  clip-path: inset(calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u)));
+}
+
+/* Small faded logo, low on the back. Pre-flipped so it reads the right way. */
+.mark {
+  position: absolute;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  bottom: calc(84 * var(--u));
+  display: flex;
+  justify-content: center;
+  transform: scaleX(-1);
+}
+
+.logo {
+  width: calc(64 * var(--u));
+  height: auto;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- The thank-you ----------
+   Same box and pre-flip as .mark, so the note and flower sit on the
+   same center line as the logo. */
+
+.gift {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(39.5 * var(--u));
+  right: 0;
+  transform: scaleX(-1);
+  opacity: 0;
+  /* Leaving: fades out quickly as the cover starts to lift */
+  transition: opacity 200ms ease;
+}
+.gift[data-show] {
+  opacity: 1;
+  transition: none;
+}
+
+/* The note, in ink on the cover */
+.note {
+  position: absolute;
+  top: calc(56 * var(--u));
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: calc(24 * var(--u));
+  line-height: calc(37 * var(--u));
+  color: var(--color-ink);
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+}
+
+.sig {
+  display: block;
+  margin-top: calc(10 * var(--u));
+  font-style: italic;
+  font-size: calc(22 * var(--u));
+  opacity: 0.75;
+}
+
+/* The pressed flower, standing up with a slight lean, between the note and the logo */
+.flower {
+  position: absolute;
+  top: calc(250 * var(--u));
+  left: 50%;
+  width: calc(200 * var(--u));
+  height: auto;
+  transform: translateX(-50%) rotate(10deg);
+}
+
+/* Only right after the cover swings shut: the note inks in, then the flower is placed */
+.gift[data-show][data-play] .note {
+  animation: ink-in 800ms ease 300ms both;
+}
+.gift[data-show][data-play] .flower {
+  animation: flower-place 900ms var(--ease-arrive) 1100ms both;
+}
+
+@keyframes ink-in {
+  from { opacity: 0; filter: blur(1px); }
+  to { opacity: 0.9; filter: blur(0); }
+}
+@keyframes flower-place {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* At rest: open shows the inside, shut shows the outside */
+.slot[data-shut] .inside {
+  opacity: 0;
+}
+.slot[data-shut] .outside {
+  opacity: 1;
+}
+
+/* ---------- Light and shadow (only while swinging, set by BackLeaf.tsx) ---------- */
+
+/* The free edge (far from the spine) darkens first, strongest when edge-on */
+.shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(26, 16, 9, 0.08), rgba(26, 16, 9, 0.55));
+}
+
+/* Soft shadow on the left page, near the spine, while the cover is just above it */
+.cast {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+  background: linear-gradient(
+    to left,
+    rgba(30, 18, 8, 0.45) 0%,
+    rgba(30, 18, 8, 0.18) 18%,
+    rgba(30, 18, 8, 0) 50%
+  );
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot[data-done] .leaf,
+  .gift {
+    transition: none;
+  }
+  .gift[data-show][data-play] .note,
+  .gift[data-show][data-play] .flower {
+    animation: none;
+  }
+}

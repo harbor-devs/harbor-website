@@ -1,0 +1,207 @@
+/* The swinging cover. Numbers are canvas pixels of the open book (1060 x 664).
+   Closed, the cover sits on the right half with its left edge on the spine.
+   Open, it lies on the left half, exactly over the board and left page.
+   These rules are the two resting states (shut and open). While it swings,
+   CoverLeaf.tsx writes every moving part straight onto the elements. */
+
+.slot {
+  position: absolute;
+  inset: 0;
+  /* Depth for the swing */
+  perspective: calc(2600 * var(--u));
+  pointer-events: none;
+}
+
+/* ---------- What stays behind: page edges, ribbon, shadow ----------
+   The cover image is drawn 3.75% bigger than its canvas (518.75 / 500).
+   Its margins: 80px left, top, right and 120px bottom, which become
+   83px and 124.5px here. The hole is exactly the cover board. */
+
+.base {
+  position: absolute;
+  left: calc(447 * var(--u));
+  top: calc(-83 * var(--u));
+  width: calc(684.75 * var(--u));
+  height: calc(871.5 * var(--u));
+  box-sizing: border-box;
+  padding: calc(83 * var(--u)) calc(83 * var(--u)) calc(124.5 * var(--u)) calc(83 * var(--u));
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  /* Cut a hole where the cover board is (that part swings with the cover) */
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+}
+/* Open: the open book's own page edges have taken over */
+.slot[data-open] .base {
+  opacity: 0;
+}
+
+/* ---------- The left half's shadow on the desk ----------
+   The open book's shadow is two halves: this one (left) and .shadowRight
+   in BookSpread. This half lives here because it arrives with the cover.
+   It sits above the pages, so it's cut away only where it would darken
+   the right page (right of the spine, inside the book's height). */
+
+.ground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
+  box-shadow:
+    0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(0, 0, 0, 0.5),
+    0 calc(6 * var(--u)) calc(20 * var(--u)) rgba(0, 0, 0, 0.3);
+  clip-path: polygon(
+    calc(-200 * var(--u)) calc(-200 * var(--u)),
+    calc(530 * var(--u)) calc(-200 * var(--u)),
+    calc(530 * var(--u)) calc(664 * var(--u)),
+    calc(800 * var(--u)) calc(664 * var(--u)),
+    calc(800 * var(--u)) calc(900 * var(--u)),
+    calc(-200 * var(--u)) calc(900 * var(--u))
+  );
+  opacity: 0;
+}
+.slot[data-open] .ground {
+  opacity: 1;
+  /* Back cover reopening: comes back as the back cover's baked shadow fades */
+  transition: opacity 300ms ease;
+}
+/* Back cover shut on the left half: its baked shadow takes over as it lands */
+.slot[data-hide-ground] .ground {
+  opacity: 0;
+  transition: opacity 300ms ease 800ms;
+}
+
+/* ---------- The cover ---------- */
+
+.leaf {
+  position: absolute;
+  top: 0;
+  left: calc(530 * var(--u));
+  /* Full book height, keeping the closed cover's shape (500 x 640) */
+  width: calc(518.75 * var(--u));
+  height: calc(664 * var(--u));
+  transform-origin: left center;
+  pointer-events: auto;
+}
+
+/* Swung over to the left */
+.slot[data-open] .leaf {
+  transform: rotateY(-180deg);
+  pointer-events: none;
+}
+
+/* Landed: hand over to the real left page (looks identical, so the fade is invisible) */
+.slot[data-done] .leaf {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms ease,
+    visibility 0s linear 200ms;
+}
+
+/* Outside of the cover */
+.front {
+  position: absolute;
+  inset: 0;
+}
+
+/* Inside of the cover. Pre-flipped, so it reads the right way round once
+   the cover lies open. Same size as the board's left half. */
+.back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(530 * var(--u));
+  height: calc(664 * var(--u));
+  transform: scaleX(-1);
+  opacity: 0;
+  border-radius: calc(6 * var(--u)) 0 0 calc(6 * var(--u));
+  background: linear-gradient(180deg, #5e4428, #3e2a16);
+}
+
+/* At rest: closed shows the outside, open shows the inside */
+.slot[data-open] .front {
+  opacity: 0;
+}
+.slot[data-open] .back {
+  opacity: 1;
+}
+
+/* Page stack edges under the left page. Exact copy of .stackLeft in
+   BookSpread.module.css, so the landed cover matches the open book. */
+.stack {
+  position: absolute;
+  top: calc(12 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(644 * var(--u));
+  border-radius: calc(3 * var(--u)) 0 0 calc(3 * var(--u));
+  background: repeating-linear-gradient(
+    to top,
+    #e8dabd 0,
+    #e8dabd calc(1.2 * var(--u)),
+    #bba57d calc(1.2 * var(--u)),
+    #bba57d calc(2 * var(--u))
+  );
+  box-shadow:
+    inset 0 calc(-2 * var(--u)) calc(3 * var(--u)) rgba(60, 40, 20, 0.35),
+    calc(-1 * var(--u)) var(--u) 0 #e6d8bc,
+    calc(-2 * var(--u)) calc(2 * var(--u)) 0 #cdb993,
+    calc(-3 * var(--u)) calc(3 * var(--u)) 0 #e2d2b2,
+    calc(-4 * var(--u)) calc(4 * var(--u)) 0 #c4ae86;
+}
+
+/* The left page, in exactly the real left page's spot */
+.page {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: calc(10 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+}
+
+/* ---------- Light and shadow (only while swinging, set by CoverLeaf.tsx) ---------- */
+
+/* As the cover turns away from the light, its free edge darkens first,
+   while the side by the spine stays lit. Strongest when edge-on. */
+.shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+/* Outside: free edge is on the right */
+.front .shade {
+  background: linear-gradient(to right, rgba(26, 16, 9, 0.08), rgba(26, 16, 9, 0.55));
+}
+/* Inside: free edge is on the left (as you see it once it lies open) */
+.back .shade {
+  background: linear-gradient(to left, rgba(26, 16, 9, 0.08), rgba(26, 16, 9, 0.55));
+}
+
+/* Soft shadow on the right page, close to the spine, while the cover is just above it */
+.cast {
+  position: absolute;
+  top: calc(8 * var(--u));
+  left: calc(530 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(640 * var(--u));
+  background: linear-gradient(
+    to right,
+    rgba(30, 18, 8, 0.45) 0%,
+    rgba(30, 18, 8, 0.18) 18%,
+    rgba(30, 18, 8, 0) 50%
+  );
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot[data-open] .ground,
+  .slot[data-hide-ground] .ground,
+  .slot[data-done] .leaf {
+    transition: none;
+  }
+}

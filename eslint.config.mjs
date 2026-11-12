@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Leftover files from the Netlify CLI, not our code:
+    ".netlify/**",
   ]),
 ]);
 
