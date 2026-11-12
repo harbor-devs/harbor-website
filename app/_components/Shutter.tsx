@@ -17,7 +17,7 @@ const SHUT = 0; // blade angle when fully shut: all edges meet exactly in the mi
 
 // The hole grows at an even pace from shut until the whole screen is clear
 const FIRST_OPEN_MS = 2000;
-const CLOSE_MS = 600;
+const CLOSE_MS = 750;
 const HOLD_MS = 250;
 const PAGE_OPEN_MS = 1600;
 const FADE_MS = 250;
@@ -197,7 +197,7 @@ export default function Shutter() {
         measure();
         pos = { x: aim.x, y: aim.y }; // close onto this page's book
         draw(aim.reach);
-        await swing(aim.reach, shutSize(), CLOSE_MS, easeIn);
+                await swing(aim.reach, shutSize(), CLOSE_MS, easeOut); // fast at first, soft landing so no hole lingers
       }
     };
 
