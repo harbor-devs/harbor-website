@@ -16,10 +16,10 @@ const LAST = N - 1;
 const SHUT = 0; // blade angle when fully shut: all edges meet exactly in the middle
 
 // The hole grows at an even pace from shut until the whole screen is clear
-const FIRST_OPEN_MS = 1500;
-const CLOSE_MS = 600;
+const FIRST_OPEN_MS = 1800;
+const CLOSE_MS = 750;
 const HOLD_MS = 250;
-const PAGE_OPEN_MS = 1200;
+const PAGE_OPEN_MS = 1500;
 const FADE_MS = 250;
 const MAX_WAIT_MS = 4000; // never stay shut longer than this, even if a picture hangs
 
