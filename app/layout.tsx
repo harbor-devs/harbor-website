@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EB_Garamond, IM_Fell_English } from "next/font/google";
+import { preload } from "react-dom";
 import PreloadTextures from "./_components/PreloadTextures";
 import "./globals.css";
 
@@ -39,6 +40,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // The cover picture is a CSS background, which browsers find late.
+  // This tells the browser to fetch it first, in the page's very first lines.
+  preload("/textures/cover.webp", { as: "image", fetchPriority: "high" });
+
   return (
     <html
       lang="en"
