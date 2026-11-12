@@ -25,6 +25,7 @@ const MAX_WAIT_MS = 4000; // never stay shut longer than this, even if a picture
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const easeIn = (t: number) => t * t;
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3); // opening: snaps apart, then slows down
 
 // Still drawing for the very first paint (before JavaScript runs). Same blades as the WebGL one.
 const R = 150; // pin circle in drawing units; "slice" below makes it 0.75 x the longer screen side
@@ -181,7 +182,7 @@ export default function Shutter() {
         await fade(1, 0);
       } else {
         measure(); // the page has settled now, so aim at where the book really is
-        await swing(shutSize(), aim.reach, ms, easeInOut, true);
+        await swing(shutSize(), aim.reach, ms, easeOut, true);
       }
       hide();
     };
