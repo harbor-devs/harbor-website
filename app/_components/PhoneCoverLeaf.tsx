@@ -27,6 +27,7 @@ type Parts = {
   shades: HTMLDivElement[]; // each strip's darkening
   backs: HTMLDivElement[]; // each strip's inside (the endpaper)
   cast: HTMLDivElement;
+  base: HTMLDivElement; // the shut book's shadow, edges and ribbon
   page: HTMLElement;
   curl: HTMLDivElement;
 };
@@ -54,6 +55,7 @@ function draw(x: Parts, v: number) {
 
   x.curl.style.opacity = String(smooth(0.55, 1, v)); // ...into the folded pages on the left
   x.cast.style.opacity = String(Math.sin(v * Math.PI) * 0.5); // its shadow on the page
+  x.base.style.opacity = String(1 - smooth(0, 0.35, v)); // shut book's shadow and edges: there when shut, gone soon after it lifts
   x.page.style.translate = `${5 * v}% 0`; // shut = centered, open = room for the curl
 }
 
@@ -182,6 +184,7 @@ export default function PhoneCoverLeaf({
   const rootRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const castRef = useRef<HTMLDivElement>(null);
+  const baseRef = useRef<HTMLDivElement>(null);
   const foldRefs = useRef<(HTMLDivElement | null)[]>([]);
   const frontRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shadeRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -208,15 +211,16 @@ export default function PhoneCoverLeaf({
     const curl = curlRef.current;
     const board = boardRef.current;
     const cast = castRef.current;
+    const base = baseRef.current;
     const all = (list: (HTMLDivElement | null)[]) => list.filter((el): el is HTMLDivElement => !!el);
     const folds = all(foldRefs.current);
     const fronts = all(frontRefs.current);
     const shades = all(shadeRefs.current);
     const backs = all(backRefs.current);
-    if (!page || !curl || !board || !cast) return;
+    if (!page || !curl || !board || !cast || !base) return;
     if (fronts.length !== STRIPS || shades.length !== STRIPS || backs.length !== STRIPS) return;
     const st = s.current;
-    st.parts = { board, folds, fronts, shades, backs, cast, page, curl };
+    st.parts = { board, folds, fronts, shades, backs, cast, base, page, curl };
     draw(st.parts, st.v);
     return () => {
       cancelAnimationFrame(st.raf);
@@ -352,6 +356,7 @@ export default function PhoneCoverLeaf({
 
   return (
     <div ref={rootRef} className={styles.root} data-side={side}>
+      <div ref={baseRef} aria-hidden="true" className={styles.base} />
       <div ref={castRef} aria-hidden="true" className={styles.cast} />
       <div ref={boardRef} className={styles.board}>
         {strip(0)}

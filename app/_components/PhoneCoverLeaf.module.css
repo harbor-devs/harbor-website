@@ -13,6 +13,27 @@
 .root[data-side="back"] {
   transform: scaleX(-1);
 }
+/* The shut book's shadow, page edges and ribbon (from the same baked image as
+   the resting cover), with a hole where the cover board is. Fades in as the
+   cover lands shut, so nothing pops when the resting cover takes over.
+   Sizes are % of the page: the image is 660 x 840 around a 500 x 640 board. */
+.base {
+  position: absolute;
+  left: -16%;
+  top: -12.5%;
+  width: 132%;
+  height: 131.25%;
+  background: url("/textures/cover.webp") 0 0 / 100% 100% no-repeat;
+  /* Everything except the board (the board swings, the rest stays) */
+  clip-path: polygon(
+    evenodd,
+    0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
+    12.121% 9.524%, 87.879% 9.524%, 87.879% 85.714%, 12.121% 85.714%, 12.121% 9.524%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* The cover's shadow on the page while it's lifted */
 .cast {
   position: absolute;
