@@ -79,12 +79,13 @@
   margin-top: calc(8 * var(--u));
 }
 
-/* Phone: pinned to the ruled area of the page, 6 rows of 32 */
+/* Phone: pinned to the ruled area of the page, rows of 32.
+   Starts one ruled line lower (248, not 216) so a 4-line sentence above it fits. */
 .phone {
   position: absolute;
   left: calc(36 * var(--u));
   right: calc(26 * var(--u));
-  top: calc(216 * var(--u));
+  top: calc(248 * var(--u));
 }
 
 .phone .list {

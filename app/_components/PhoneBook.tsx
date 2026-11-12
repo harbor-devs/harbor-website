@@ -254,20 +254,23 @@ export default function PhoneBook({
     }
 
     // ---- the turn ----
-    function begin(dir: 1 | -1, C: Point, byHand: boolean) {
+    function begin(dir: 1 | -1, C: Point, byHand: boolean, peekOnly = false) {
       if (!engine) return;
       const i = dir > 0 ? shown : shown - 1;
       engine.setPage(tex[i], paper[i]);
       turn = { dir, C, T: dir > 0 ? { ...C } : { x: END_X, y: C.y }, anim: null, peek: false, byHand };
       engine.draw(turn.C, turn.T);
+      // Peek: the drawn page only shows in the corner, the real page stays under it
+      canvas.parentElement?.toggleAttribute("data-peek", peekOnly);
       canvas.toggleAttribute("data-on", true);
-      // Same frame: the page under the turning one
-      if (dir > 0) show(shown + 1);
+      // Same frame: the page under the turning one (not for the peek: the real page stays)
+      if (dir > 0 && !peekOnly) show(shown + 1);
     }
 
     // Stop the curl and show the flat page again
     function reset() {
       turn = null;
+      canvas.parentElement?.removeAttribute("data-peek");
       show(shown);
       canvas.toggleAttribute("data-on", false);
       engine?.clear();
@@ -333,7 +336,7 @@ export default function PhoneBook({
     // The corner lifts a little and settles: shows the page can be folded
     function peek() {
       if (turn || drag || !canAnimate() || shown >= last) return;
-      begin(1, BOTTOM, false);
+      begin(1, BOTTOM, false, true);
       // begin() just set the turn, but TypeScript can't see that, so look again
       const started = turn as Turn | null;
       if (!started) return;

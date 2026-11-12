@@ -58,7 +58,10 @@ export const introduction = {
       <p className={d.kickerPhone}>Chapter I</p>
       <h1 className={d.titlePhone}>Hello, I&apos;m Abdullah</h1>
       <Flourish className={d.flourishPhone} />
-      <p className={d.linePhone}>I build, publish and take on work.</p>
+      <p className={d.linePhone}>
+        Time forgets what is hurried and keeps what is made with care. I am trying
+        to build the second kind.
+      </p>
 
       <ChapterContents variant="phone" />
     </>

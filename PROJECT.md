@@ -5,25 +5,27 @@ Anyone working on the repo (people or AI tools) should read this first.
 
 ## What this is
 
-Harbor is the home for Abdullah Saghir's independent work (software, games,
-articles, research) and the place to hire him for services. The site is
-designed as a vintage diary: a closed book that opens and is read chapter by
-chapter.
+Harbor is the working notebook of Abdullah Saghir: the home for his software,
+websites and writing, and the place to hire him for websites, web apps and
+small tools (hiring goes through his Upwork profile, the site has no contact
+page). The site is designed as a vintage diary: a closed book that opens and
+is read chapter by chapter.
 
 ## Current status
 
-- Branch `book-engine`: building a custom book engine to replace the
-  route-level View Transitions page turn.
-- Branch `main`: last stable version (View Transitions page turn). Not deployed.
-- Cover and Introduction have real designs. Every other chapter is a placeholder.
+- Branch `book-engine`: the finished site (book engine, phone version, all
+  five chapters, polish). Being merged into `main` for launch.
+- Branch `main`: older version (View Transitions page turn). Replaced at launch.
+- Hosting: Netlify, built from GitHub. Domain: harbordevs.com.
 
 ## Stack
 
 - Next.js 16.4 (App Router, Cache Components), React 19.3, TypeScript
 - Tailwind CSS v4 through PostCSS (`@tailwindcss/postcss`), plus CSS Modules
+- page-flip library for the laptop page turn, our own WebGL curl for phones
 - ESLint (Next.js config)
 - No backend, database or auth. Not needed yet.
-- Hosting: not chosen yet (see Phase 5)
+- Hosting: Netlify (free plan), deployed from the GitHub repo
 
 ## Run it locally (Windows PowerShell)
 
@@ -32,49 +34,72 @@ npm install      # first time, or after package.json changes
 npm run dev      # dev server at http://localhost:3000
 npm run lint     # check code style
 npm run build    # production build, run before merging
+npm run start    # run the production build locally
 ```
+
+Testing on a phone: connect the laptop and phone to the same network (or the
+phone's hotspot), open the "Network" address `npm run dev` prints, and add that
+IP to `allowedDevOrigins` in `next.config.ts` if the page loads without animations.
 
 ## Folder map
 
 ```
 app/
-  layout.tsx            root layout shared by every page
-  page.tsx              the cover ( / )
-  <chapter>/page.tsx    one route per chapter
-  globals.css           design tokens and global styles
-  _lib/chapters.ts      the single chapter list; all navigation reads it
-  _components/          ClosedBook, BookSpread (laptop), PhonePage (phone),
-                        BookNav, PhoneNav, PhoneMenu, ChapterShell,
-                        ChapterContents, PlaceholderChapter, Flourish, icons
+  layout.tsx              root layout: fonts, tab title, description, link previews
+  icon.png, apple-icon.png, favicon.ico, opengraph-image.png
+                          tab icon, home-screen icon, link preview picture
+  (book)/layout.tsx       the one shared book every chapter lives in
+  (book)/page.tsx         the cover ( / )
+  (book)/<chapter>/       one route per chapter (only sets the tab title)
+  (book)/the-end/         the closed back cover with the flower note
+  portfolio/[category]/   one cork-board page per portfolio category
+  _chapters/              chapter content: Introduction, Portfolio, Now,
+                          Services, Sketchbook (left page, right page, phone page)
+  _components/            Book (the engine), BookSpread, FlipBook, CoverLeaf,
+                          BackLeaf, ClosedBook, Cover, SideArrows (laptop);
+                          PhoneBook, PhoneCoverLeaf, PhoneBackCover, PhoneNav,
+                          PhoneMenu (phone); Board, BoardProps, DeskNotes,
+                          CallingCard, ChapterContents, CategoryList, icons
+  _lib/                   chapters.ts (the single chapter list), portfolio.ts,
+                          portfolioItems.ts, pageCurl.ts (phone WebGL curl),
+                          paintSheet.ts (draws a phone page for the curl),
+                          coverSwing.ts, useSwipe.ts, paperTextures.ts
+  globals.css             design tokens and global styles
 public/
-  textures/             baked paper, desk and cover images
-  logo-mark.svg         logo
-  cover-logo.svg        logo version used on the cover
-  sketches/             margin sketches
+  textures/               baked paper, desk, cover and wood-wall images
+  writing/                article PDFs
+  logo-mark.svg           logo
+  cover-logo.svg          logo version used on the cover
+  flower-sprig.svg        the thank-you flower on the back cover
+  sketches/               margin sketches
 docs/
-  textures.md           how the textures were made
+  book-engine.md          how the book engine works
+  textures.md             how the textures were made
 ```
 
 ## URLs
 
 | URL | Page |
 | --- | --- |
-| `/` | Closed cover |
-| `/introduction` | Introduction and contents |
-| `/portfolio` | Portfolio categories |
-| `/services` | Services |
-| `/now` | What I'm working on now |
-| `/sketchbook` | Ideas (clearly marked as not built) |
-| `/contact` | Contact |
+| `/` | Closed front cover |
+| `/introduction` | Chapter I: introduction and contents |
+| `/portfolio` | Chapter II: portfolio categories |
+| `/portfolio/software` | Board: software and websites |
+| `/portfolio/articles` | Board: articles |
+| `/now` | Chapter III: what I'm working on now |
+| `/services` | Chapter IV: services (hire through Upwork) |
+| `/sketchbook` | Chapter V: ideas, clearly marked as not built |
+| `/the-end` | Closed back cover with the thank-you flower |
 
-Every chapter URL must work when opened directly or refreshed.
+Every URL must work when opened directly or refreshed. Games, Research Papers
+and Certifications boards are hidden until they have real items.
 
 ## Design (locked)
 
 - One look only. No dark mode.
 - Colors: paper `#F2E8D5`, ink `#3B2A1E`, accent `#8B2E23`, haze `#2A1F14`,
   gold `#A8823C` (thin decoration only, never text).
-- Fonts: IM Fell English for headings. The body font is being replaced in Phase 4.
+- Fonts: IM Fell English for headings, EB Garamond for body text (kept, decided 2026-11-12).
 - Laptop (900px and up, Tailwind `book:` prefix): two-page spread on a
   1060 x 664 book that scales to fit.
 - Phone: one A5-shaped page (330 x 467) with the folded-back pages curling
@@ -85,7 +110,7 @@ Every chapter URL must work when opened directly or refreshed.
 ## Site rules
 
 - Very user friendly. The style never gets in the way of finding or reading things.
-- Menu always visible, page marker always shown, contact reachable from every page.
+- Menu always visible, page marker always shown, Services (the way to hire) reachable from every page.
 - Respect reduced motion: page turns become a plain swap.
 - No photo of the owner. No fake team, stats or testimonials. Plain language.
 - Honest status labels on every project. Nothing unbuilt is shown as built.
@@ -115,55 +140,43 @@ Follow in order. Each step is discussed, built, tested and committed.
       `experimental.agentFeedback` removed
 - Moved to Phase 4: review the `unrs-resolver` install script
 
-### Phase 1: book engine (laptop)
-- [ ] Plan the engine: one book stays on screen, real pages turn, the URL
-      updates per chapter, direct URLs still work
-- [ ] 3D page turn (back of the page, shadows)
-- [ ] Click lock while a page is turning
-- [ ] Every way to turn: on-screen arrows, top nav jumps, keyboard arrows,
-      scroll to turn, dragging the page, browser back and forward
-- [ ] Always-visible menu, page marker, "scroll or swipe to turn" hint on page 1
-- [ ] Reduced motion: plain swap
-- [ ] Cover opening (designed together first; also fix the `cover-logo.svg` width/height warning)
-- [ ] Closing and back cover
-- [ ] Animated flower thank-you at the end
+### Phase 1: book engine, laptop (done)
+- [x] One book stays on screen, real pages turn, the URL updates per chapter
+- [x] Page turn with the page-flip library, click lock, riffle for big jumps
+- [x] Every way to turn: side arrows, top nav, keyboard arrows, scroll, drag
+- [x] Menu, page marker, turn hint on page 1, reduced motion = plain swap
+- [x] Cover opening and closing, back cover, flower thank-you
 
-### Phase 2: phone (the most important version)
-- [ ] One A5 page with the folded-back curl
-- [ ] Swipe to turn
-- [ ] Phone menu and bottom bar inside the engine
-- [ ] Test on a real phone
+### Phase 2: phone (done)
+- [x] One A5 page with the folded-back curl, WebGL page curl, swipe to turn
+- [x] Corner peek hint, phone covers swing and can be dragged
+- [x] Tested on a real phone (Redmi Note 12)
 
-### Phase 3: chapters, in reading order
-- [ ] Introduction (text sits on the ruled lines; says both: the work and hiring)
-- [ ] Portfolio opening: Software/Websites, Games, Articles, Research Papers, Certifications
-- [ ] Each category as its own designed, scrollable page
-- [ ] Project pages: problem, research, build, result; screenshots, status, tech, links
-- [ ] "Old camera" transition only when entering these pages
-- [ ] Hover states that come alive
-- [ ] Services
-- [ ] Now
-- [ ] Sketchbook
-- [ ] Contact
-- [ ] Testimonials only once real ones exist
+### Phase 3: chapters (done)
+- [x] Introduction, Portfolio (+ software and articles boards), Now,
+      Services (calling card, hire through Upwork), Sketchbook
+- [x] Contact chapter removed (hiring goes through Upwork)
 
 ### Phase 4: polish
-- [ ] Replace the body font
-- [ ] Darker, more solid lines
-- [ ] Final visual pass (vintage textures, nothing flat)
-- [ ] Accessibility check
-- [ ] Speed check
+- [x] Darker ruled lines (textures re-baked)
+- [x] Body font: kept EB Garamond
+- [x] Three-line cover title, side arrows, clearer open hints
+- [x] Smooth cover shadows (laptop and phone), no flicker in the phone corner peek
+- [x] Favicon from the small logo mark, link previews, description
+- [x] Removed the blurry glow above the closed cover (cover.webp)
+- [x] Docs and license
+- [ ] Accessibility and speed check
 - [ ] Review the `unrs-resolver` install script before allowing it
-- [ ] SEO, favicon from the small logo mark, link previews
-- [ ] Update the design canvas to match the code
-- [ ] QA review (report only)
+- [ ] Update the design canvas to match the code (after launch)
 
 ### Phase 5: launch
 - [ ] Test on Firefox, Chrome, Edge and phone
 - [ ] Merge `book-engine` into `main`
-- [ ] Choose a host (check current terms first) and make the repo public
-- [ ] Add a license (default plan: all rights reserved)
-- [ ] Later: domain, professional email
+- [x] Choose a host: Netlify (Vercel Hobby is non-commercial only)
+- [ ] Make the repo public
+- [x] License: all rights reserved (LICENSE)
+- [ ] Domain harbordevs.com pointed at Netlify
+- [ ] Later: professional email, Games, Research Papers and Certifications boards
 
 ## Decisions log
 
@@ -176,3 +189,11 @@ Follow in order. Each step is discussed, built, tested and committed.
   glitchy. One book that stays on screen allows real page turns.
 - 2026-10-26: Turned off Next.js telemetry and removed `experimental.agentFeedback`
   (privacy first; CLAUDE.md already gives AI tools their instructions).
+- 2026-11-03: Hosting on Netlify. Vercel Hobby is for non-commercial use only,
+  and Harbor offers paid services.
+- 2026-11-11: Removed the Contact chapter. Hiring goes through Upwork, so the
+  site has five chapters.
+- 2026-11-12: Kept EB Garamond as the body font. Laptop gets round side arrows
+  beside the book; phone keeps its bottom bar and swiping.
+- 2026-11-12: License is "all rights reserved": the repo is public to show the
+  work, not to be reused.

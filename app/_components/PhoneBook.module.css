@@ -118,6 +118,13 @@
   pointer-events: none;
 }
 
+/* Corner peek hint: only the bottom-right corner shows the drawn page,
+   the rest stays the real page (drawn text looks a bit thinner, so a
+   full swap made the page flicker light then bold) */
+.glHost[data-peek] {
+  clip-path: inset(87% -20px -20px 70%);
+}
+
 .gl {
   position: absolute;
   visibility: hidden;

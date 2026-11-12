@@ -206,7 +206,7 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
           ctx.fillRect(r.left, r.bottom - bw, r.width, bw);
         }
       }
-    } else if (node instanceof Text) {
+     } else if (node instanceof Text) {
       const el = node.parentElement;
       if (!el || el.closest("svg") || isSrOnly(el)) continue;
       const text = node.data;
@@ -216,13 +216,20 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
       ctx.fillStyle = cs.color;
       ctx.textBaseline = "alphabetic";
       const upper = cs.textTransform === "uppercase";
+      // Links on the page (category and contents names) have a soft underline: draw it too
+      const underline = cs.textDecorationLine.includes("underline");
+      const ulOffset = parseFloat(cs.textUnderlineOffset) || 2;
+      const ulThick = parseFloat(cs.textDecorationThickness) || 1;
+      const ulColor = cs.textDecorationColor;
       // Text on a tilted desk note leans with it
       const noteSlot = el.closest<HTMLElement>("[data-paint-slot]");
       const lean = noteSlot ? radians(getComputedStyle(noteSlot).rotate) : 0;
       const range = document.createRange();
       for (let i = 0; i < text.length; i++) {
         let ch = text[i];
-        if (ch === " " || ch === "\n") continue;
+        if (ch === "\n") continue;
+        // Spaces are skipped, unless the text is underlined (the line runs under them too)
+        if (ch === " " && !underline) continue;
         // Keep surrogate pairs (emoji and such) together
         let len = 1;
         if (/[\uD800-\uDBFF]/.test(ch) && i + 1 < text.length) {
@@ -239,6 +246,7 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
         const a = m.fontBoundingBoxAscent;
         const d = m.fontBoundingBoxDescent;
         if (lean) {
+          if (ch === " ") continue;
           // Spin the letter around its own centre
           ctx.save();
           ctx.translate(r.left + r.width / 2, r.top + r.height / 2);
@@ -248,7 +256,12 @@ export async function paintSheet(sheet: HTMLElement, texW: number): Promise<HTML
           continue;
         }
         const baseline = r.top + (r.height - (a + d)) / 2 + a;
-        ctx.fillText(glyph, r.left, baseline);
+        if (underline) {
+          ctx.fillStyle = ulColor;
+          ctx.fillRect(r.left, baseline + ulOffset, r.width, ulThick);
+          ctx.fillStyle = cs.color;
+        }
+        if (ch !== " ") ctx.fillText(glyph, r.left, baseline);
       }
     }
   }
