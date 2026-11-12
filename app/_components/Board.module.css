@@ -30,7 +30,7 @@
   inset: -24px;
   z-index: -2;
   background: url("/textures/wood-wall.webp") center / cover;
-  filter: blur(3.5px) brightness(0.78) saturate(0.85);
+  /* filter: blur(3.5px) brightness(0.78) saturate(0.85); */
   will-change: transform;
 }
 
