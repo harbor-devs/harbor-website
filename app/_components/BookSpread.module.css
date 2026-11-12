@@ -13,7 +13,8 @@
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  padding: var(--chrome-top) 16px var(--chrome-bottom);
+   /* 96px each side: room for the round arrows beside the book */
+  padding: var(--chrome-top) 96px var(--chrome-bottom);
 }
 
 .book {

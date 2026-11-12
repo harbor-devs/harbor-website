@@ -11,6 +11,7 @@ import CoverLeaf from "./CoverLeaf";
 import FlipBook from "./FlipBook";
 import PhoneBackCover from "./PhoneBackCover";
 import PhoneBook from "./PhoneBook";
+import SideArrows from "./SideArrows";
 import { grabCover, type CoverGrab } from "./PhoneCoverLeaf";
 import { PhoneHeader, PhoneTurnBar } from "./PhoneNav";
 import TurnHint from "./TurnHint";
@@ -163,14 +164,38 @@ export default function Book({ content }: BookProps) {
   if (!turned && index !== startIndex) setTurned(true);
   const showHint = open && index === 0 && !turned;
 
-  // Under the book, once it stops moving: "Click to open" (front shut),
-  // the bottom bar (open), or "Contact / The end / Read again" (back shut).
+  // Laptop: round arrows beside the book. Same places as the arrow keys go.
+  const sidePrev = prevHref
+    ? {
+        href: prevHref,
+        label: backClosed ? "Open the book again" : prevHref === COVER_HREF ? "Close the book" : "Previous chapter",
+      }
+    : null;
+  const sideNext = nextHref
+    ? {
+        href: nextHref,
+        label: closed ? "Open the book" : nextHref === BACK_COVER_HREF ? "Close the book" : "Next chapter",
+      }
+    : null;
+  const sides = <SideArrows prev={sidePrev} next={sideNext} />;
+
+  // Under the book, once it stops moving: the side arrows, plus the line under
+  // the shut front cover, the bottom bar (open), or the back cover bar (back shut).
   const footer = shutDone ? (
-    <CoverHint />
+    <>
+      {sides}
+      <CoverHint />
+    </>
   ) : open ? (
-    <BookBottomBar nav={nav} />
+    <>
+      {sides}
+      <BookBottomBar nav={nav} />
+    </>
   ) : backShutDone ? (
-    <BackCoverBar />
+    <>
+      {sides}
+      <BackCoverBar />
+    </>
   ) : null;
 
   // Keyboard: Left and Right arrows turn the page (or open/close the book).

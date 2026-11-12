@@ -66,7 +66,7 @@ export default function Cover({ onGrab }: CoverProps) {
         <div className={phone.footer}>
           <div className={styles.phoneHintSlot}>
             <Link href={CHAPTERS[0].href} className={styles.hint} aria-hidden="true" tabIndex={-1}>
-              Tap to open
+              Tap, or swipe left to flip it open
               <ArrowRight />
             </Link>
           </div>
@@ -76,14 +76,11 @@ export default function Cover({ onGrab }: CoverProps) {
   );
 }
 
-// Laptop: "Click to open" under the closed cover (sits in the book's bottom bar slot)
+// Laptop: a plain line under the closed cover (the round arrow beside the book opens it)
 export function CoverHint() {
   return (
     <div className={styles.hintSlot}>
-      <Link href={CHAPTERS[0].href} className={styles.hint} aria-hidden="true" tabIndex={-1}>
-        Click to open
-        <ArrowRight />
-      </Link>
+      <p className={styles.hintText}>Use the arrow, or drag the cover to flip it open</p>
     </div>
   );
 }

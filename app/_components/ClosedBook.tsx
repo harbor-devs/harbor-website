@@ -54,7 +54,13 @@ export default function ClosedBook({ bare = false, phone = false }: ClosedBookPr
 
         <span className={styles.title}>Harbor</span>
         <Flourish className={styles.flourish} />
-        <span className={styles.subtitle}>The working notebook of Abdullah Saghir</span>
+       <span className={styles.subtitle}>
+  The working notebook
+  <br />
+  of
+  <br />
+  Abdullah Saghir
+</span>
       </span>
     </Link>
   );
