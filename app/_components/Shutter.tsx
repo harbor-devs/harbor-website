@@ -17,7 +17,7 @@ const SHUT = 0; // blade angle when fully shut: all edges meet exactly in the mi
 
 // The hole grows at an even pace from shut until the whole screen is clear
 const FIRST_OPEN_MS = 1500;
-const CLOSE_MS = 750;
+const CLOSE_MS = 600;
 const HOLD_MS = 250;
 const PAGE_OPEN_MS = 1200;
 const FADE_MS = 250;
@@ -197,7 +197,7 @@ export default function Shutter() {
         measure();
         pos = { x: aim.x, y: aim.y }; // close onto this page's book
         draw(aim.reach);
-                await swing(aim.reach, shutSize(), CLOSE_MS, easeOut); // fast at first, soft landing so no hole lingers
+        await swing(aim.reach, shutSize(), CLOSE_MS, easeIn);
       }
     };
 
@@ -207,18 +207,8 @@ export default function Shutter() {
       await new Promise<void>((r) =>
         "requestIdleCallback" in window ? requestIdleCallback(() => r(), { timeout: 1000 }) : setTimeout(r, 300),
       );
-      // Then wait until 3 frames in a row arrive on time (under 25 ms apart),
-      // so the opening never starts while the page is still busy and freezes on a tiny hole.
-      // Gives up after 1.5 seconds so the shutter can never get stuck shut.
-      const giveUp = performance.now() + 1500;
-      let smooth = 0;
-      let last = performance.now();
-      while (smooth < 3 && performance.now() < giveUp) {
-        await frame();
-        const now = performance.now();
-        smooth = now - last < 25 ? smooth + 1 : 0;
-        last = now;
-      }
+      await frame();
+      await frame();
     };
     // 1. First opening of the site. When done, tell PreloadTextures it can start downloading.
     ready(location.pathname).then(async () => {
@@ -242,10 +232,7 @@ export default function Shutter() {
     const goTo = async (href: string, target: string) => {
       busy = true;
       const pictures = ready(target); // start loading the next page's pictures while closing
-           await close();
-      // Let the fully shut frame reach the screen before the heavy page swap starts
-      await frame();
-      await frame();
+      await close();
       if (!alive) return;
       router.push(href);
       onBoard = isBoard(target);
