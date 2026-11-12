@@ -52,3 +52,5 @@ desktop.ini
 CLAUDE.local.md
 # Local Netlify folder
 .netlify
+# Netlify CLI agent skills (tool files, not site code)
+.agents
