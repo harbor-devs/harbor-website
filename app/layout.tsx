@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EB_Garamond, IM_Fell_English } from "next/font/google";
+import PreloadTextures from "./_components/PreloadTextures";
 import "./globals.css";
 
 // Body text font
@@ -43,7 +44,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${garamond.variable} ${fell.variable} h-full antialiased`}
     >
-      <body className="min-h-dvh flex flex-col">{children}</body>
+      <body className="min-h-dvh flex flex-col">
+        {children}
+        <PreloadTextures />
+      </body>
     </html>
   );
 }
