@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { boardFontFamilies } from "../_lib/boardFonts";
 
 // Downloads the paper pictures in the background once the site has opened,
 // so a page already has its paper when it turns (no brown flash, no text-first pop in).
 // Same 900px split as the book: phones get the phone pages, laptops the big spread.
 // It waits until the camera shutter has finished opening, so the download
 // doesn't make the opening stutter on a first visit.
+// It also fetches the portfolio board fonts, so the boards are ready before anyone opens one.
 
 const PHONE = [
   "/textures/page-phone-intro.webp",
@@ -35,6 +37,10 @@ export default function PreloadTextures() {
         img.decoding = "async";
         img.src = src;
         kept.push(img);
+      }
+      // Board fonts: ask the browser to download them now (quietly, errors ignored)
+      for (const family of boardFontFamilies) {
+        document.fonts.load(`16px ${family}`).catch(() => {});
       }
     };
 
