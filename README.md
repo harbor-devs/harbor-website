@@ -7,7 +7,7 @@ Upwork profile) for websites, web apps and small tools.
 The site is designed as a vintage diary. It opens as a closed book and is read
 chapter by chapter, with real page turns on laptop and on phone.
 
-**Status:** finished, getting ready to go live at harbordevs.com (hosted on Netlify).
+**Status:** live on Cloudflare Pages. Domain harbordevs.com is next.
 
 ## Built with
 
@@ -21,7 +21,7 @@ No backend, database or tracking.
 
 ## Run it locally
 
-Needs [Node.js](https://nodejs.org) (LTS).
+Needs [Node.js](https://nodejs.org) 22 (see `.nvmrc`).
 
 ```bash
 npm install

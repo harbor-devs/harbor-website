@@ -13,19 +13,20 @@ is read chapter by chapter.
 
 ## Current status
 
-- Branch `book-engine`: the finished site (book engine, phone version, all
-  five chapters, polish). Being merged into `main` for launch.
-- Branch `main`: older version (View Transitions page turn). Replaced at launch.
-- Hosting: Netlify, built from GitHub. Domain: harbordevs.com.
+- Branch `main`: the live site (book engine, phone version, all five chapters,
+  polish). Every push to `main` deploys.
+- Hosting: Cloudflare Pages, built from GitHub (harbordevs.pages.dev).
+  Domain harbordevs.com to be pointed at it.
 
 ## Stack
 
-- Next.js 16.4 (App Router, Cache Components), React 19.3, TypeScript
+- Next.js 16.4 (App Router, static export to `out`), React 19.3, TypeScript
 - Tailwind CSS v4 through PostCSS (`@tailwindcss/postcss`), plus CSS Modules
 - page-flip library for the laptop page turn, our own WebGL curl for phones
 - ESLint (Next.js config)
 - No backend, database or auth. Not needed yet.
-- Hosting: Netlify (free plan), deployed from the GitHub repo
+- Hosting: Cloudflare Pages (free), deployed from the GitHub repo.
+  Build `npm run build`, output folder `out`, Node 22 (`.nvmrc`)
 
 ## Run it locally (Windows PowerShell)
 
@@ -46,6 +47,8 @@ IP to `allowedDevOrigins` in `next.config.ts` if the page loads without animatio
 ```
 app/
   layout.tsx              root layout: fonts, tab title, description, link previews
+  not-found.tsx           diary-style 404 page
+  robots.ts, sitemap.ts   robots.txt and sitemap.xml
   icon.png, apple-icon.png, favicon.ico, opengraph-image.png
                           tab icon, home-screen icon, link preview picture
   (book)/layout.tsx       the one shared book every chapter lives in
@@ -66,6 +69,7 @@ app/
                           coverSwing.ts, useSwipe.ts, paperTextures.ts
   globals.css             design tokens and global styles
 public/
+  _headers                Cloudflare Pages security and cache headers
   textures/               baked paper, desk, cover and wood-wall images
   writing/                article PDFs
   logo-mark.svg           logo
@@ -168,14 +172,17 @@ Follow in order. Each step is discussed, built, tested and committed.
 - [ ] Accessibility and speed check
 - [ ] Review the `unrs-resolver` install script before allowing it
 - [ ] Update the design canvas to match the code (after launch)
+- [ ] Only the open page's headings visible to search and screen readers (after launch)
+- [ ] Split Book.tsx into smaller parts (after launch)
 
 ### Phase 5: launch
 - [ ] Test on Firefox, Chrome, Edge and phone
-- [ ] Merge `book-engine` into `main`
-- [x] Choose a host: Netlify (Vercel Hobby is non-commercial only)
-- [ ] Make the repo public
+- [x] Merge `book-engine` into `main`
+- [x] Choose a host: Cloudflare Pages (moved from Netlify)
+- [x] Make the repo public
 - [x] License: all rights reserved (LICENSE)
-- [ ] Domain harbordevs.com pointed at Netlify
+- [x] 404 page, robots.txt, sitemap.xml, security headers
+- [ ] Domain harbordevs.com pointed at Cloudflare Pages
 - [ ] Later: professional email, Games, Research Papers and Certifications boards
 
 ## Decisions log
@@ -197,3 +204,5 @@ Follow in order. Each step is discussed, built, tested and committed.
   beside the book; phone keeps its bottom bar and swiping.
 - 2026-11-12: License is "all rights reserved": the repo is public to show the
   work, not to be reused.
+- 2026-11-13: Moved hosting from Netlify to Cloudflare Pages (static export),
+  because the Netlify free plan credits ran low.
