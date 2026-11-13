@@ -4,9 +4,8 @@ import Board from "../../_components/Board";
 import { CATEGORIES } from "../../_lib/portfolio";
 import { ITEMS } from "../../_lib/portfolioItems";
 
-// The whole board depends on the category in the URL, so there is no shared
-// shell to prefetch. The boards are still built ahead of time below.
-export const instant = false;
+// Only the categories in the list get a page. Any other one shows the 404.
+export const dynamicParams = false;
 
 // Builds the category boards ahead of time
 export function generateStaticParams() {
