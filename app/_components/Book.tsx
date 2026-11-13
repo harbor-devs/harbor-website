@@ -69,7 +69,7 @@ export default function Book({ content }: BookProps) {
   const [settledOpen, setSettledOpen] = useState(!closed);
   // Where the back cover last finished swinging: true = shut, false = open
   const [backSettledShut, setBackSettledShut] = useState(backClosed);
-    // The mouse swinging the laptop front cover by hand, open or shut (until it lands)
+  // The mouse swinging the laptop front cover by hand, open or shut (until it lands)
   const [drag, setDrag] = useState<CoverGrab | null>(null);
   // Same, for the laptop back cover
   const [backDrag, setBackDrag] = useState<CoverGrab | null>(null);
@@ -86,9 +86,9 @@ export default function Book({ content }: BookProps) {
   // Only shuts once the front is open and the pages are on the last chapter
   const backShut = backClosed && coverDone && flipAt === LAST;
   // Open and resting: the real last page shows
-    const backDone = !backShut && (instant || !backSettledShut) && !backDrag;
+  const backDone = !backShut && (instant || !backSettledShut) && !backDrag;
   // Shut and resting
-    const backShutDone = backShut && (instant || backSettledShut) && !backDrag;
+  const backShutDone = backShut && (instant || backSettledShut) && !backDrag;
 
   // Where the pages go. They wait for the back cover to be fully open,
   // and for the front cover to be fully open before leaving the first chapter.
@@ -149,11 +149,11 @@ export default function Book({ content }: BookProps) {
 
   // The book is fully open on a chapter (neither cover in the way or moving)
   const open = coverDone && backDone;
-    // Laptop: the mouse can swing the front cover. Drag the shut cover left to
+  // Laptop: the mouse can swing the front cover. Drag the shut cover left to
   // open it, or drag the first left page right to close it.
   const canDragOpen = !instant && shutDone && flipAt === 0;
   const canDragShut = !instant && open && index === 0 && flipAt === 0;
-    // Drag the last right page left to shut the back cover, or the shut back cover right to open it
+  // Drag the last right page left to shut the back cover, or the shut back cover right to open it
   const canDragBackShut = !instant && open && index === LAST && flipAt === LAST;
   const canDragBackOpen = !instant && backShutDone;
 
@@ -167,15 +167,15 @@ export default function Book({ content }: BookProps) {
   // Laptop: round arrows beside the book. Same places as the arrow keys go.
   const sidePrev = prevHref
     ? {
-        href: prevHref,
-        label: backClosed ? "Open the book again" : prevHref === COVER_HREF ? "Close the book" : "Previous chapter",
-      }
+      href: prevHref,
+      label: backClosed ? "Open the book again" : prevHref === COVER_HREF ? "Close the book" : "Previous chapter",
+    }
     : null;
   const sideNext = nextHref
     ? {
-        href: nextHref,
-        label: closed ? "Open the book" : nextHref === BACK_COVER_HREF ? "Close the book" : "Next chapter",
-      }
+      href: nextHref,
+      label: closed ? "Open the book" : nextHref === BACK_COVER_HREF ? "Close the book" : "Next chapter",
+    }
     : null;
   const sides = <SideArrows prev={sidePrev} next={sideNext} />;
 
@@ -277,8 +277,8 @@ export default function Book({ content }: BookProps) {
           backClosed={backShut}
           clipLeft={!coverDone}
           clipRight={!backDone}
-                    onGrabPages={canDragShut ? (e, startX) => setDrag(grabCover(e, startX, true)) : null}
-                              onGrabBack={canDragBackShut ? (e, startX) => setBackDrag(grabCover(e, startX, true)) : null}
+          onGrabPages={canDragShut ? (e, startX) => setDrag(grabCover(e, startX, true)) : null}
+          onGrabBack={canDragBackShut ? (e, startX) => setBackDrag(grabCover(e, startX, true)) : null}
           header={
             <>
               {/* Logo top-left once the book is open, or resting on its back cover */}
@@ -288,7 +288,7 @@ export default function Book({ content }: BookProps) {
           }
           footer={footer}
           cover={
-                <CoverLeaf
+            <CoverLeaf
               open={coverOpen}
               done={coverDone}
               hideGround={backShut}
@@ -306,7 +306,7 @@ export default function Book({ content }: BookProps) {
             />
           }
           back={
-                        <BackLeaf
+            <BackLeaf
               shut={backShut}
               done={backDone}
               rested={backShutDone}
@@ -356,34 +356,34 @@ export default function Book({ content }: BookProps) {
               cover={
                 !phoneCoverDone || grab
                   ? {
-                      open: phoneCoverOpen,
-                      grab,
+                    open: phoneCoverOpen,
+                    grab,
+                    // Landed (open or shut): the hand is done
+                    onSettle: (o) => {
+                      setPhoneSettledOpen(o);
+                      setGrab(null);
+                    },
+                    // Let go past halfway: the URL catches up while it finishes
+                    onLetGo: (o) => {
+                      router.push(o ? CHAPTERS[0].href : COVER_HREF, { scroll: false });
+                    },
+                  }
+                  : !phoneBackDone || backGrab
+                    ? {
+                      side: "back",
+                      // "open" means the book is open, so the back cover is off the page
+                      open: !phoneBackShut,
+                      grab: backGrab,
                       // Landed (open or shut): the hand is done
                       onSettle: (o) => {
-                        setPhoneSettledOpen(o);
-                        setGrab(null);
+                        setPhoneBackSettledShut(!o);
+                        setBackGrab(null);
                       },
                       // Let go past halfway: the URL catches up while it finishes
                       onLetGo: (o) => {
-                        router.push(o ? CHAPTERS[0].href : COVER_HREF, { scroll: false });
+                        router.push(o ? CHAPTERS[LAST].href : BACK_COVER_HREF, { scroll: false });
                       },
                     }
-                  : !phoneBackDone || backGrab
-                    ? {
-                        side: "back",
-                        // "open" means the book is open, so the back cover is off the page
-                        open: !phoneBackShut,
-                        grab: backGrab,
-                        // Landed (open or shut): the hand is done
-                        onSettle: (o) => {
-                          setPhoneBackSettledShut(!o);
-                          setBackGrab(null);
-                        },
-                        // Let go past halfway: the URL catches up while it finishes
-                        onLetGo: (o) => {
-                          router.push(o ? CHAPTERS[LAST].href : BACK_COVER_HREF, { scroll: false });
-                        },
-                      }
                     : null
               }
             />

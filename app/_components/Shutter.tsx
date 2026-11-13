@@ -87,10 +87,10 @@ function ready(path: string) {
   const pictures = picturesFor(path).map((src) => {
     const img = new Image();
     img.src = src;
-    return img.decode().catch(() => {});
+    return img.decode().catch(() => { });
   });
-  const fonts = document.fonts ? document.fonts.ready.then(() => {}) : Promise.resolve();
-  return Promise.race([Promise.all([...pictures, fonts]).then(() => {}), wait(MAX_WAIT_MS)]);
+  const fonts = document.fonts ? document.fonts.ready.then(() => { }) : Promise.resolve();
+  return Promise.race([Promise.all([...pictures, fonts]).then(() => { }), wait(MAX_WAIT_MS)]);
 }
 
 export default function Shutter() {
@@ -163,7 +163,7 @@ export default function Shutter() {
 
     const fade = async (from: number, to: number) => {
       const a = root.animate([{ opacity: from }, { opacity: to }], { duration: FADE_MS, easing: "ease", fill: "forwards" });
-      await a.finished.catch(() => {});
+      await a.finished.catch(() => { });
       root.style.opacity = String(to);
       a.cancel();
     };
@@ -201,7 +201,7 @@ export default function Shutter() {
       }
     };
 
-     // Lets the page finish setting itself up, so the opening is not fighting it for the first frames.
+    // Lets the page finish setting itself up, so the opening is not fighting it for the first frames.
     // Waits until the browser is free (up to 1 second), then two more frames.
     const settle = async () => {
       await new Promise<void>((r) =>
